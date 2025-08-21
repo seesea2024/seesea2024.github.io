@@ -1,0 +1,11 @@
+- name: 技能
+  keywords:
+      - 系统：Linux
+      - 语言：Java、Python、Shell、JavaScript
+      - 框架：SpringBoot、SpringCloud、Dubbo、Mybatis、JPA、Hibernate
+      - 工具：Git、Maven、Gradle
+      - Devops：Jenkins、CI/CD、Docker、Kubernetes
+      - 分布式中间件：Nginx、Tomcat、Redis、Kafka、ZooKeeper、DFS、Nacos
+      - 数据库：MySQL、MongoDB、Elasticsearch
+      - 大数据：Hadoop、Flink、Spark、HDFS、Kafka
+      - 其他：微服务、AI
