@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>HotSpot GC及参数设置 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/02/12/iteye-180/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="HotSpot GC及参数设置">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="JVM参数调整无非是调整堆中各种内存的大小，选择最优的GC算法（行为）。一般有两个指标来考量：Pause时间Throughput  GC类型有：Serial GCThe serial collector uses a single thread to perform all garbage collection work, which makes it relatively efficient since there is no communication overhead between threads. It is best-suited to single processor machines, since it cannot take advantage of multiprocessor hardware, although it can be useful on multiprocessors for applications with small data sets (up to approximately 100MB). The serial collector is selected by default on certain hardware and operating system configurations, or can be explicitly enabled with the option -XX:+UseSerialGCThe Throughput Collector  -XX:+UseParallelGC主要是针对young generation的，Tenured Generation还是Serial Collector   The parallel collector (also known as the throughput collector) performs minor collections in parallel, which can significantly reduce garbage collection overhead. It is intended for applications with medium- to large-sized data sets that are run on multiprocessor or multi-threaded hardware. The parallel collector is selected by default on certain hardware and operating system configurations, or can be explicitly enabled with the option -XX:+UseParallelGC.New: parallel compaction is a feature introduced in J2SE 5.0 update 6 and enhanced in Java SE 6 that allows the parallel collector to perform major collections in parallel. Without parallel compaction, major collections are performed using a single thread, which can significantly limit scalability. Parallel compaction is enabled by adding the option -XX:+UseParallelOldGC to the command line    The Concurrent Low Pause Collector      -Xincgc or  -XX:+UseConcMarkSweepGC 主要是正对Tenure Generation的   The concurrent collector performs most of its work concurrently (i.e., while the application is still running) to keep garbage collection pauses short. It is designed for applications with medium- to large-sized data sets for which response time is more important than overall throughput, since the techniques used to minimize pauses can reduce application performance. The concurrent collector is enabled with the option -XX:+UseConcMarkSweepGC.  The Incremental Low Pause Collector       -XX:+UseTrainGC    下面介绍一下各种参数的意义-Xms  -Xmx      Heap 内存设置      堆内存不是一下子就分配-Xmx大小的，随着GC的进行，从-Xms慢慢递增的      基本来说Heap内存分配太大的话，GC的次数会减少，但是做一次GC的Pause时间会很大。反之亦然。  + -Xincgc       Incremental GC,也即GC的Train算法,  增量GC一次只收集部分Heap对象，而不是针对整个堆。如果GC Pause 时间太长的话可以考虑用这个选项调试一下  -Xss       栈大小设置，从Java6开始，32-bit JVM默认是320k，64-bit JVM默认是1024k。（题外话，64-bit JVM并不会所有类型double一下，只是可分配的Heap内存和线程数会更多）       注意栈大小设置太小的话，递归多的话会出现栈溢出；栈太大的话，如果Application中线程比较多（每个线程有自己的栈），可分配的栈变少，就会出现 running out of memeory问题。Server 和 Client端GC策略不同，考虑到可用的Heap Size,CPU数量等。">
+    <meta name="og:description" content="JVM参数调整无非是调整堆中各种内存的大小，选择最优的GC算法（行为）。一般有两个指标来考量：Pause时间Throughput  GC类型有：Serial GCThe serial collector uses a single thread to perform all garbage collection work, which makes it relatively efficient since there is no communication overhead between threads. It is best-suited to single processor machines, since it cannot take advantage of multiprocessor hardware, although it can be useful on multiprocessors for applications with small data sets (up to approximately 100MB). The serial collector is selected by default on certain hardware and operating system configurations, or can be explicitly enabled with the option -XX:+UseSerialGCThe Throughput Collector  -XX:+UseParallelGC主要是针对young generation的，Tenured Generation还是Serial Collector   The parallel collector (also known as the throughput collector) performs minor collections in parallel, which can significantly reduce garbage collection overhead. It is intended for applications with medium- to large-sized data sets that are run on multiprocessor or multi-threaded hardware. The parallel collector is selected by default on certain hardware and operating system configurations, or can be explicitly enabled with the option -XX:+UseParallelGC.New: parallel compaction is a feature introduced in J2SE 5.0 update 6 and enhanced in Java SE 6 that allows the parallel collector to perform major collections in parallel. Without parallel compaction, major collections are performed using a single thread, which can significantly limit scalability. Parallel compaction is enabled by adding the option -XX:+UseParallelOldGC to the command line    The Concurrent Low Pause Collector      -Xincgc or  -XX:+UseConcMarkSweepGC 主要是正对Tenure Generation的   The concurrent collector performs most of its work concurrently (i.e., while the application is still running) to keep garbage collection pauses short. It is designed for applications with medium- to large-sized data sets for which response time is more important than overall throughput, since the techniques used to minimize pauses can reduce application performance. The concurrent collector is enabled with the option -XX:+UseConcMarkSweepGC.  The Incremental Low Pause Collector       -XX:+UseTrainGC    下面介绍一下各种参数的意义-Xms  -Xmx      Heap 内存设置      堆内存不是一下子就分配-Xmx大小的，随着GC的进行，从-Xms慢慢递增的      基本来说Heap内存分配太大的话，GC的次数会减少，但是做一次GC的Pause时间会很大。反之亦然。  + -Xincgc       Incremental GC,也即GC的Train算法,  增量GC一次只收集部分Heap对象，而不是针对整个堆。如果GC Pause 时间太长的话可以考虑用这个选项调试一下  -Xss       栈大小设置，从Java6开始，32-bit JVM默认是320k，64-bit JVM默认是1024k。（题外话，64-bit JVM并不会所有类型double一下，只是可分配的Heap内存和线程数会更多）       注意栈大小设置太小的话，递归多的话会出现栈溢出；栈太大的话，如果Application中线程比较多（每个线程有自己的栈），可分配的栈变少，就会出现 running out of memeory问题。Server 和 Client端GC策略不同，考虑到可用的Heap Size,CPU数量等。">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/02/12/iteye-180/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-02-12">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="HotSpot GC及参数设置">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">HotSpot GC及参数设置</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/02/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#iteye" title="iteye">iteye</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>JVM参数调整无非是调整堆中各种内存的大小，选择最优的GC算法（行为）。一般有两个指标来考量：</p>
+<ul>
+<li>Pause时间</li>
+<li>Throughput  </li>
+</ul>
+<p>GC类型有：</p>
+<h3 id="serial-gc">Serial GC</h3>
+<p>The serial collector uses a single thread to perform all garbage collection work, which makes it relatively efficient since there is no communication overhead between threads. It is best-suited to single processor machines, since it cannot take advantage of multiprocessor hardware, although it can be useful on multiprocessors for applications with small data sets (up to approximately 100MB). The serial collector is selected by default on certain hardware and operating system configurations, or can be explicitly enabled with the option <strong>-XX:+UseSerialGC</strong></p>
+<h3 id="the-throughput-collector-">The Throughput Collector  </h3>
+<p>-XX:+UseParallelGC主要是针对young generation的，Tenured Generation还是Serial Collector   The parallel collector (also known as the throughput collector) performs minor collections in parallel, which can significantly reduce garbage collection overhead. It is intended for applications with medium- to large-sized data sets that are run on multiprocessor or multi-threaded hardware. The parallel collector is selected by default on certain hardware and operating system configurations, or can be explicitly enabled with the option <strong>-XX:+UseParallelGC</strong>.</p>
+<p>New: parallel compaction is a feature introduced in J2SE 5.0 update 6 and enhanced in Java SE 6 that allows the parallel collector to perform major collections in parallel. Without parallel compaction, major collections are performed using a single thread, which can significantly limit scalability. Parallel compaction is enabled by adding the option <strong>-XX:+UseParallelOldGC</strong> to the command line    </p>
+<h3 id="the-concurrent-low-pause-collector-">The Concurrent Low Pause Collector      </h3>
+<p>-Xincgc or  <strong>-XX:+UseConcMarkSweepGC</strong> 主要是正对Tenure Generation的   The concurrent collector performs most of its work concurrently (i.e., while the application is still running) to keep garbage collection pauses short. It is designed for applications with medium- to large-sized data sets for which response time is more important than overall throughput, since the techniques used to minimize pauses can reduce application performance. The concurrent collector is enabled with the option -XX:+UseConcMarkSweepGC.  </p>
+<h3 id="the-incremental-low-pause-collector-">The Incremental Low Pause Collector       </h3>
+<p><strong>-XX:+UseTrainGC</strong>    
+下面介绍一下各种参数的意义</p>
+<ul>
+<li>-Xms  -Xmx      Heap 内存设置      堆内存不是一下子就分配-Xmx大小的，随着GC的进行，从-Xms慢慢递增的      基本来说Heap内存分配太大的话，GC的次数会减少，但是做一次GC的Pause时间会很大。反之亦然。  
++ -Xincgc       Incremental GC,也即GC的Train算法,  增量GC一次只收集部分Heap对象，而不是针对整个堆。如果GC Pause 时间太长的话可以考虑用这个选项调试一下  </li>
+<li>-Xss       栈大小设置，从Java6开始，32-bit JVM默认是320k，64-bit JVM默认是1024k。（题外话，64-bit JVM并不会所有类型double一下，只是可分配的Heap内存和线程数会更多）       注意栈大小设置太小的话，递归多的话会出现栈溢出；栈太大的话，如果Application中线程比较多（每个线程有自己的栈），可分配的栈变少，就会出现 running out of memeory问题。</li>
+</ul>
+<p>Server 和 Client端GC策略不同，考虑到可用的Heap Size,CPU数量等。</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/02/12/iteye-180/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

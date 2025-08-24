@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Java thread Dump &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2019/03/30/java-thread-dump/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="Java thread Dump">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="java thread dump分析">
+    <meta name="og:description" content="java thread dump分析">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2019/03/30/java-thread-dump/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2019-03-30">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Java thread Dum">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Java thread Dump</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2019/03/30
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#JVM" title="JVM">JVM</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>java thread dump分析</p>
+<h2 id="section">产生方式</h2>
+<p>jstack -l [pid]</p>
+<p>kill -3 [pid]</p>
+<p>// When the specified process is running on a 64-bit Java Virtual Machine, you might need to specify the -J-d64 option
+jstack -J-d64 [core dump文件]</p>
+<h2 id="smr">SMR线程</h2>
+<p>This section contains the thread list Safe Memory Reclamation (SMR) information1, which enumerates the addresses of all non-JVM internal threads (e.g. non-VM and non-Garbage Collection (GC)).</p>
+<pre><code>Threads class SMR info:
+_java_thread_list=0x00000250e5488a00, length=13, elements={
+0x00000250e4979000, 0x00000250e4982800, 0x00000250e52f2800, 0x00000250e4992800,
+0x00000250e4995800, 0x00000250e49a5800, 0x00000250e49ae800, 0x00000250e5324000,
+0x00000250e54cd800, 0x00000250e54cf000, 0x00000250e54d1800, 0x00000250e54d2000,
+0x00000250e54d0800
+}
+
+&quot;Reference Handler&quot; #2 daemon prio=10 os_prio=2 tid=0x00000250e4979000 nid=0x3c28 waiting on condition  [0x000000b82a9ff000]
+
+&quot;Finalizer&quot; #3 daemon prio=8 os_prio=1 tid=0x00000250e4982800 nid=0x2a54 in Object.wait()  [0x000000b82aaff000]
+
+&quot;Signal Dispatcher&quot; #4 daemon prio=9 os_prio=2 tid=0x00000250e52f2800 nid=0x2184 runnable  [0x0000000000000000]
+
+&quot;Attach Listener&quot; #5 daemon prio=5 os_prio=2 tid=0x00000250e4992800 nid=0x1624 waiting on condition  [0x0000000000000000]
+
+
+&quot;C2 CompilerThread0&quot; #6 daemon prio=9 os_prio=2 tid=0x00000250e4995800 nid=0x4198 waiting on condition  [0x0000000000000000]
+
+&quot;C2 CompilerThread1&quot; #7 daemon prio=9 os_prio=2 tid=0x00000250e49a5800 nid=0x3b98 waiting on condition  [0x0000000000000000]
+
+&quot;C1 CompilerThread2&quot; #8 daemon prio=9 os_prio=2 tid=0x00000250e49ae800 nid=0x1a84 waiting on condition  [0x0000000000000000]
+
+&quot;Sweeper thread&quot; #9 daemon prio=9 os_prio=2 tid=0x00000250e5324000 nid=0x5f0 runnable  [0x0000000000000000]
+
+&quot;Service Thread&quot; #10 daemon prio=9 os_prio=0 tid=0x00000250e54cd800 nid=0x169c runnable  [0x0000000000000000]
+
+
+&quot;Common-Cleaner&quot; #11 daemon prio=8 os_prio=1 tid=0x00000250e54cf000 nid=0x1610 in Object.wait()  [0x000000b82b2fe000]
+
+&quot;Thread-0&quot; #12 prio=5 os_prio=0 tid=0x00000250e54d1800 nid=0xdec waiting for monitor entry  [0x000000b82b4ff000]
+
+&quot;Thread-1&quot; #13 prio=5 os_prio=0 tid=0x00000250e54d2000 nid=0x415c waiting for monitor entry  [0x000000b82b5ff000]
+
+&quot;DestroyJavaVM&quot; #14 prio=5 os_prio=0 tid=0x00000250e54d0800 nid=0x2b8c waiting on condition  [0x0000000000000000]
+
+</code></pre>
+<h2 id="vmgc">VM和GC线程</h2>
+<pre><code>&quot;VM Thread&quot; os_prio=2 tid=0x00000250e496d800 nid=0x1920 runnable  
+&quot;GC Thread#0&quot; os_prio=2 tid=0x00000250c35b5800 nid=0x310c runnable  
+&quot;GC Thread#1&quot; os_prio=2 tid=0x00000250c35b8000 nid=0x12b4 runnable  
+&quot;GC Thread#2&quot; os_prio=2 tid=0x00000250c35ba800 nid=0x43f8 runnable  
+&quot;GC Thread#3&quot; os_prio=2 tid=0x00000250c35c0800 nid=0x20c0 runnable  
+&quot;G1 Main Marker&quot; os_prio=2 tid=0x00000250c3633000 nid=0x4068 runnable  
+&quot;G1 Conc#0&quot; os_prio=2 tid=0x00000250c3636000 nid=0x3e28 runnable  
+&quot;G1 Refine#0&quot; os_prio=2 tid=0x00000250c367e000 nid=0x3c0c runnable  
+&quot;G1 Refine#1&quot; os_prio=2 tid=0x00000250e47fb800 nid=0x3890 runnable  
+&quot;G1 Refine#2&quot; os_prio=2 tid=0x00000250e47fc000 nid=0x32a8 runnable  
+&quot;G1 Refine#3&quot; os_prio=2 tid=0x00000250e47fd800 nid=0x3d00 runnable  
+&quot;G1 Young RemSet Sampling&quot; os_prio=2 tid=0x00000250e4800800 nid=0xef4 runnable  
+&quot;VM Periodic Task Thread&quot; os_prio=2 tid=0x00000250e54d6800 nid=0x3468 waiting on condition  
+
+
+</code></pre>
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2019/03/30/java-thread-dump/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

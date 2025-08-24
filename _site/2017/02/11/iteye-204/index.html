@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>rownum解析 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/02/11/iteye-204/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="rownum解析">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="Oracle rownum">
+    <meta name="og:description" content="Oracle rownum">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/02/11/iteye-204/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-02-11">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="rownum解析">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">rownum解析</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/02/11
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#iteye" title="iteye">iteye</a>
+          </span>
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#oracle" title="oracle">oracle</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>Oracle rownum<!--more--></p>
+<p>** 摘自：<a href="http://tenn.iteye.com/blog/99339%EF%BC%8C%E4%BB%85%E4%BE%9B%E8%87%AA%E5%AD%A6">http://tenn.iteye.com/blog/99339，仅供自学</a> ** </p>
+<p>在Oracle中，要按特定条件查询前N条记录，用个rownum就搞定了。</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">emp</span> <span class="k">where</span> <span class="n">rownum</span> <span class="o">&lt;=</span> <span class="mi">5</span> 
+</code></pre></div></div>
+<p>而且书上也告诫，不能对rownum用&quot;&gt;&quot;，这也就意味着，如果你想用</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">emp</span> <span class="k">where</span> <span class="n">rownum</span> <span class="o">&gt;</span> <span class="mi">5</span> 
+</code></pre></div></div>
+<p>则是失败的。要知道为什么会失败，则需要了解rownum背后的机制：</p>
+<ol>
+<li>Oracle executes your query.</li>
+<li>Oracle fetches the first row and calls it row number 1.</li>
+<li>Have we gotten past row number meets the criteria?
+<ul>
+<li>If no, then Oracle discards the row,</li>
+<li>If yes, then Oracle return the row.</li>
+</ul>
+</li>
+<li>Oracle fetches the next row and advances the row number (to 2, and then to 3, and then to 4, and so forth).</li>
+<li>Go to step 3.
+了解了原理，就知道rownum&gt;不会成功，因为在第三步的时候查询出的行已经被丢弃，第四步查出来的rownum仍然是1,这样永远也不会成功。 同样道理，rownum如果单独用=,也只有在rownum=1时才有用。  </li>
+</ol>
+<p>对于rownum来说它是oracle系统顺序分配为从查询返回的行的编号，返回的第一行分配的是1，第二行是2，依此类推，这个伪字段可以用于限制查询返回的总行数，而且rownum不能以任何表的名称作为前缀。</p>
+<p>举例说明：
+例如表：
+student(学生)表，表结构为：</p>
+<pre><code>ID　　　    char(6)　　　　　 --学号 
+name　　　　VARCHAR2(100)　　　--姓名 
+</code></pre>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">create</span> <span class="k">table</span> <span class="n">student</span> <span class="p">(</span><span class="n">ID</span> <span class="nb">char</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">name</span> <span class="n">VARCHAR2</span><span class="p">(</span><span class="mi">100</span><span class="p">));</span> 
+<span class="k">insert</span> <span class="k">into</span> <span class="n">sale</span> <span class="k">values</span><span class="p">(</span><span class="s1">'200001'</span><span class="p">,</span><span class="err">‘张一’</span><span class="p">);</span> 
+<span class="k">insert</span> <span class="k">into</span> <span class="n">sale</span> <span class="k">values</span><span class="p">(</span><span class="s1">'200002'</span><span class="p">,</span><span class="err">‘王二’</span><span class="p">);</span> 
+<span class="k">insert</span> <span class="k">into</span> <span class="n">sale</span> <span class="k">values</span><span class="p">(</span><span class="s1">'200003'</span><span class="p">,</span><span class="err">‘李三’</span><span class="p">);</span> 
+<span class="k">insert</span> <span class="k">into</span> <span class="n">sale</span> <span class="k">values</span><span class="p">(</span><span class="s1">'200004'</span><span class="p">,</span><span class="err">‘赵四’</span><span class="p">);</span> 
+<span class="k">commit</span><span class="p">;</span>
+</code></pre></div></div>
+<p>(1) rownum 对于等于某值的查询条件 如果希望找到学生表中第一条学生的信息，可以使用rownum=1作为条件。但是想找到学生表中第二条学生的信息，使用rownum=2结果查不到数据。因为rownum都是从1开始，但是1以上的自然数在rownum做等于判断是时认为都是false条件，所以无法查到rownum = n（n&gt;1的自然数）。</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SQL</span><span class="o">&gt;</span> <span class="k">select</span> <span class="n">rownum</span><span class="p">,</span><span class="n">id</span><span class="p">,</span><span class="n">name</span> <span class="k">from</span> <span class="n">student</span> <span class="k">where</span> <span class="n">rownum</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="err">（可以用在限制返回记录条数的地方，保证不出错，如：隐式游标）</span> 
+<span class="k">SQL</span><span class="o">&gt;</span> <span class="k">select</span> <span class="n">rownum</span><span class="p">,</span><span class="n">id</span><span class="p">,</span><span class="n">name</span> <span class="k">from</span> <span class="n">student</span> <span class="k">where</span> <span class="n">rownum</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="err">   </span> 
+<span class="n">ROWNUM</span> <span class="n">ID</span><span class="err">    </span> <span class="n">NAME</span>
+<span class="c1">----------------------        </span>
+     <span class="mi">1</span> <span class="mi">200001</span> <span class="err">张一</span> 
+     
+<span class="k">SQL</span><span class="o">&gt;</span> <span class="k">select</span> <span class="n">rownum</span><span class="p">,</span><span class="n">id</span><span class="p">,</span><span class="n">name</span> <span class="k">from</span> <span class="n">student</span> <span class="k">where</span> <span class="n">rownum</span> <span class="o">=</span><span class="mi">2</span><span class="p">;</span> <span class="err">   </span>
+<span class="n">ROWNUM</span> <span class="n">ID</span><span class="err">    </span> <span class="n">NAME</span> 
+</code></pre></div></div>
+<p>（2）rownum对于大于某值的查询条件   
+如果想找到从第二行记录以后的记录，当使用rownum&gt;2是查不出记录的，原因是由于rownum是一个总是从1开始的伪列，Oracle 认为rownum&gt; n(n&gt;1的自然数)这种条件依旧不成立，所以查不到记录</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SQL</span><span class="o">&gt;</span> <span class="k">select</span> <span class="n">rownum</span><span class="p">,</span><span class="n">id</span><span class="p">,</span><span class="n">name</span> <span class="k">from</span> <span class="n">student</span> <span class="k">where</span> <span class="n">rownum</span> <span class="o">&gt;</span><span class="mi">2</span><span class="p">;</span> 
+<span class="n">ROWNUM</span> <span class="n">ID</span><span class="err">    </span> <span class="n">NAME</span> 
+</code></pre></div></div>
+<p>那如何才能找到第二行以后的记录呀。可以使用以下的子查询方法来解决。注意子查询中的rownum必须要有别名，否则还是不会查出记录来，这是因为rownum不是某个表的列，如果不起别名的话，无法知道rownum是子查询的列还是主查询的列。</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SQL</span><span class="o">&gt;</span><span class="k">select</span> <span class="o">*</span> <span class="k">from</span><span class="p">(</span><span class="k">select</span> <span class="n">rownum</span> <span class="k">no</span> <span class="p">,</span><span class="n">id</span><span class="p">,</span><span class="n">name</span> <span class="k">from</span> <span class="n">student</span><span class="p">)</span> <span class="k">where</span> <span class="k">no</span><span class="o">&gt;</span><span class="mi">2</span><span class="p">;</span> <span class="err">       </span> 
+<span class="k">NO</span> <span class="n">ID</span><span class="err">    </span> <span class="n">NAME</span>
+<span class="c1">----------------</span>
+ <span class="mi">3</span> <span class="mi">200003</span> <span class="err">李三</span> <span class="err">        </span>
+ <span class="mi">4</span> <span class="mi">200004</span> <span class="err">赵四</span> 
+ 
+<span class="k">SQL</span><span class="o">&gt;</span> <span class="k">select</span> <span class="o">*</span> <span class="k">from</span><span class="p">(</span><span class="k">select</span> <span class="n">rownum</span><span class="p">,</span><span class="n">id</span><span class="p">,</span><span class="n">name</span> <span class="k">from</span> <span class="n">student</span><span class="p">)</span><span class="k">where</span> <span class="n">rownum</span><span class="o">&gt;</span><span class="mi">2</span><span class="p">;</span> <span class="err">   </span>
+<span class="n">ROWNUM</span> <span class="n">ID</span><span class="err">    </span> <span class="n">NAME</span> 
+</code></pre></div></div>
+<p>（3）rownum对于小于某值的查询条件 如果想找到第三条记录以前的记录，当使用rownum&lt;3是能得到两条记录的。显然rownum对于rownum&lt;n（(n&gt;1的自然数）的条件认为是成立的，所以可以找到记录。</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SQL</span><span class="o">&gt;</span> <span class="k">select</span> <span class="n">rownum</span><span class="p">,</span><span class="n">id</span><span class="p">,</span><span class="n">name</span> <span class="k">from</span> <span class="n">student</span> <span class="k">where</span> <span class="n">rownum</span> <span class="o">&lt;</span><span class="mi">3</span><span class="p">;</span> <span class="err">   </span> 
+<span class="n">ROWNUM</span> <span class="n">ID</span><span class="err">    </span> <span class="n">NAME</span>
+<span class="c1">----------------------</span>
+     <span class="mi">1</span> <span class="mi">200001</span> <span class="err">张一</span> <span class="err">       </span>
+     <span class="mi">2</span> <span class="mi">200002</span> <span class="err">王二</span>
+</code></pre></div></div>
+<p>综上几种情况，可能有时候需要查询rownum在某区间的数据，那怎么办呀从上可以看出rownum对小于某值的查询条件是人为true的，rownum对于大于某值的查询条件直接认为是false的，但是可以间接的让它转为认为是true的。那就必须使用子查询。例如要查询rownum在第二行到第三行之间的数据，包括第二行和第三行数据，那么我们只能写以下语句，先让它返回小于等于三的记录行，然后在主查询中判断新的rownum的别名列大于等于二的记录行。但是这样的操作会在大数据集中影响速度。</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SQL</span><span class="o">&gt;</span> <span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="p">(</span><span class="k">select</span> <span class="n">rownum</span> <span class="k">no</span><span class="p">,</span><span class="n">id</span><span class="p">,</span><span class="n">name</span> <span class="k">from</span> <span class="n">student</span> <span class="k">where</span> <span class="n">rownum</span><span class="o">&lt;=</span><span class="mi">3</span> <span class="p">)</span> <span class="k">where</span> <span class="k">no</span> <span class="o">&gt;=</span><span class="mi">2</span><span class="p">;</span> <span class="err">       </span>
+<span class="k">NO</span> <span class="n">ID</span><span class="err">    </span> <span class="n">NAME</span>
+<span class="c1">------------------</span>
+ <span class="mi">2</span> <span class="mi">200002</span> <span class="err">王二</span> <span class="err">        </span>
+ <span class="mi">3</span> <span class="mi">200003</span> <span class="err">李三</span> 
+</code></pre></div></div>
+<p>（4）rownum和排序 Oracle中的rownum的是在取数据的时候产生的序号，所以想对指定排序的数据去指定的rowmun行数据就必须注意了。</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SQL</span><span class="o">&gt;</span> <span class="k">select</span> <span class="n">rownum</span> <span class="p">,</span><span class="n">id</span><span class="p">,</span><span class="n">name</span> <span class="k">from</span> <span class="n">student</span> <span class="k">order</span> <span class="k">by</span> <span class="n">name</span><span class="p">;</span> <span class="err">   </span> 
+<span class="n">ROWNUM</span> <span class="n">ID</span><span class="err">    </span> <span class="n">NAME</span> <span class="n">i</span>
+<span class="c1">---------- ------ ------         </span>
+     <span class="mi">3</span> <span class="mi">200003</span> <span class="err">李三</span> <span class="err">        </span> 
+     <span class="mi">2</span> <span class="mi">200002</span> <span class="err">王二</span> <span class="err">        </span>
+     <span class="mi">1</span> <span class="mi">200001</span> <span class="err">张一</span> <span class="err">        </span>
+     <span class="mi">4</span> <span class="mi">200004</span> <span class="err">赵四</span> 
+</code></pre></div></div>
+<p>可以看出，rownum并不是按照name列来生成的序号。系统是按照记录插入时的顺序给记录排的号，rowid也是顺序分配的。为了解决这个问题，必须使用子查询</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SQL</span><span class="o">&gt;</span> <span class="k">select</span> <span class="n">rownum</span> <span class="p">,</span><span class="n">id</span><span class="p">,</span><span class="n">name</span> <span class="k">from</span> <span class="p">(</span><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">student</span> <span class="k">order</span> <span class="k">by</span> <span class="n">name</span><span class="p">);</span> <span class="err">   </span>
+<span class="n">ROWNUM</span> <span class="n">ID</span><span class="err">    </span> <span class="n">NAME</span> 
+<span class="c1">---------- ------ ----         </span>
+     <span class="mi">1</span> <span class="mi">200003</span> <span class="err">李三</span> <span class="err">        </span>
+     <span class="mi">2</span> <span class="mi">200002</span> <span class="err">王二</span> <span class="err">        </span> 
+     <span class="mi">3</span> <span class="mi">200001</span> <span class="err">张一</span> <span class="err">        </span> 
+     <span class="mi">4</span> <span class="mi">200004</span> <span class="err">赵四</span> 
+</code></pre></div></div>
+<p>这样就成了按name排序，并且用rownum标出正确序号（有小到大）</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/02/11/iteye-204/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

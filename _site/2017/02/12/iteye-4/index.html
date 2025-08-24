@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>数据库分库分表规则 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/02/12/iteye-4/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="数据库分库分表规则">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="分库分表摘自: http://rdc.taobao.com/team/jm/archives/590一般有几个目标：">
+    <meta name="og:description" content="分库分表摘自: http://rdc.taobao.com/team/jm/archives/590一般有几个目标：">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/02/12/iteye-4/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-02-12">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="数据库分库分表规则">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">数据库分库分表规则</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/02/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#iteye" title="iteye">iteye</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h2 id="section">分库分表</h2>
+<hr />
+<p>摘自: <a href="http://rdc.taobao.com/team/jm/archives/590">http://rdc.taobao.com/team/jm/archives/590</a></p>
+<hr />
+<p>一般有几个目标：</p>
+<ol>
+<li>数据离散性，数据分布到多个库，多个表中 mod, round robin, dayofweek,dayofMonth  </li>
+<li>避免热点数据在一个数据库库表上  </li>
+<li>扩容时有大的数据迁移  </li>
+</ol>
+<p>以下的解决方案基于 整表搬迁但不会有表中行级数据迁移  </p>
+<p>【水平扩展scale-out方案模式一】</p>
+<p>阶段一：一个库DB0之内分4个表，id%4 dbRule: “DB0&quot; tbRule: “t”  + (id % 4)</p>
+<p>阶段二：增加db1库，t2和t3整表搬迁到db1 dbRule: “DB&quot; + ((id%4)/2) tbRule: “t”  + (id % 4)</p>
+<p>阶段三：增加DB2和DB3库，t1整表搬迁到DB2，t3整表搬迁的DB3： 为了规则表达，通过内部名称映射或其他方式，我们将DB1和DB2的名称和位置互换得到下图 dbRule: “DB&quot; + (id%4) tbRule: “t”  + (id % 4)    </p>
+<p>如果更进一步数据库的设计和部署上能做到每个表一个硬盘，那么扩容的过程只要把原有机器的某一块硬盘拔下来， 插入到新的机器上，就完成整表搬迁了！可以大大缩短停机时间。 具体在mysql上可以以库为表。开始一个物理机上启动4个数据库实例，每次倍增机器，直接将库搬迁到新的机器上。 这样从始至终规则都不需要变化，一直都是： dbRule: “DB” + (id % 4) tbRule: “t”  + (id % 4)  </p>
+<p>不足是： 即逻辑上始终保持4库4表，每个表一个库。 从一个库到4个库的过程中，单表的数据量一直在增长。当单表的数据量超过一定范围时，可能会带来性能问题。比如索引的问题，历史数据清理的问题。 另外当开始预留的表个数用尽，到了4物理库每库1个表的阶段，再进行扩容的话，不可避免的要从表上下手。    </p>
+<p>【水平扩展scale-out方案模式二】
+阶段一：一个数据库，两个表 分库规则dbRule: “DB0″ 分表规则tbRule: “t” + (id % 2)</p>
+<p>阶段二：当单库的数据量接近1千万，单表的数据量接近500万时，进行扩容（数据量只是举例，具体扩容量要根据数据库和实际压力状况决定）： 增加一个数据库DB1，将DB0.t1整表迁移到新库DB1。 每个库各增加1个表，未来10M-20M的数据mod2分别写入这2个表：t0_1，t1_1： 分库规则dbRule: “DB” + (id % 2) 分表规则tbRule:</p>
+<pre><code>if(id &lt; 1千万){
+        return &quot;t&quot;+ (id % 2);   //1千万之前的数据，仍然放在t0和t1表。t1表从DB0搬迁到DB1库
+    }else if(id &lt; 2千万){
+        return &quot;t&quot;+ (id % 2) +&quot;_1&quot;; //1千万之后的数据，各放到两个库的两个表中: t0_1,t1_1
+    }else{
+        throw new IllegalArgumentException(&quot;id outof range[20000000]:&quot; + id);
+    }
+</code></pre>
+<p>这样10M以后的新生数据会均匀分布在DB0和DB1; 插入更新和查询热点仍然能够在每个库中均匀分布。 每个库中同时有老数据和不断增长的新数据。每表的数据仍然控制在500万以下。  </p>
+<p>阶段三：当两个库的容量接近上限继续水平扩展时，进行如下操作： 新增加两个库：DB2和DB3. 以id % 4分库。余数0、1、2、3分别对应DB的下标. t0和t1不变， 将DB0.t0_1整表迁移到DB2; 将DB1.t1_1整表迁移到DB3 20M-40M的数据mod4分为4个表：t0_2，t1_2，t2_2，t3_2，分别放到4个库中：   分库规则dbRule:</p>
+<pre><code> if(id &lt; 2千万){
+      //2千万之前的数据，4个表分别放到4个库
+      if(id &lt; 1千万){
+          return &quot;db&quot;+  (id % 2);     //原t0表仍在db0, t1表仍在db1
+      }else{
+          return &quot;db&quot;+ ((id % 2) +2); //原t0_1表从db0搬迁到db2; t1_1表从db1搬迁到db3
+      }
+  }else if(id &lt; 4千万){
+      return &quot;db&quot;+ (id % 4);          //超过2千万的数据，平均分到4个库
+  }else{
+      throw new IllegalArgumentException(&quot;id out of range. id:&quot;+id);
+  }
+  
+  
+</code></pre>
+<p>分表规则tbRule:</p>
+<pre><code class="language- ">   if(id &lt; 2千万){        //2千万之前的数据，表规则和原先完全一样，参见阶段二
+      if(id &lt; 1千万){
+          return &quot;t&quot;+ (id % 2);       //1千万之前的数据，仍然放在t0和t1表
+      }else{
+          return &quot;t&quot;+ (id % 2) +&quot;_1&quot;; //1千万之后的数据，仍然放在t0_1和t1_1表
+      }
+  }else if(id &lt; 4千万){
+      return &quot;t&quot;+ (id % 4)+&quot;_2&quot;;      //超过2千万的数据分为4个表t0_2，t1_2，t2_2，t3_2
+  }else{
+      throw new IllegalArgumentException(&quot;id out of range. id:&quot;+id);
+  }
+     dbRule: “DB” + (id % 4) tbRule: “t”  + (id % 4)
+</code></pre>
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/02/12/iteye-4/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

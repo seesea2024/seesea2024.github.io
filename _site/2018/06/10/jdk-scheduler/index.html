@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>JDK scheduler &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2018/06/10/jdk-scheduler/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="JDK scheduler">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="Java JDK实现调度方式有Timer和ScheduledThreadPoolExecutor (不考虑Quartz以及Spring Scheduler等)">
+    <meta name="og:description" content="Java JDK实现调度方式有Timer和ScheduledThreadPoolExecutor (不考虑Quartz以及Spring Scheduler等)">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2018/06/10/jdk-scheduler/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2018-06-10">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="JDK scheduler">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">JDK scheduler</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2018/06/10
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#scheduler" title="scheduler">scheduler</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths">
+    <article class="article-content markdown-body">
+    <p>Java JDK实现调度方式有Timer和ScheduledThreadPoolExecutor (不考虑Quartz以及Spring Scheduler等)</p>
+<h2 id="timer">Timer</h2>
+<p>基本类Timer/TimerTask，JDK Timer两个缺点</p>
+<ul>
+<li>只有一个线程执行所有TimerTask，如果有一个TimerTask比较耗时，其他TimerTask执行时间就不准了</li>
+<li>TimerTask中间抛出异常会终止Timer，其他任务也不能调度了</li>
+</ul>
+<h2 id="scheduledexecutorservice--scheduledthreadpoolexecutor">ScheduledExecutorService / ScheduledThreadPoolExecutor</h2>
+<p>Executors.newScheduledThreadPool能解决Timer上面两个问题。从实现看，它基于优先级队列实现。</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="cm">/**
+     * Creates a new {@code ScheduledThreadPoolExecutor} with the
+     * given core pool size.
+     *
+     * @param corePoolSize the number of threads to keep in the pool, even
+     *        if they are idle, unless {@code allowCoreThreadTimeOut} is set
+     * @throws IllegalArgumentException if {@code corePoolSize &lt; 0}
+     */</span>
+    <span class="kd">public</span> <span class="nf">ScheduledThreadPoolExecutor</span><span class="o">(</span><span class="kt">int</span> <span class="n">corePoolSize</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">corePoolSize</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="no">NANOSECONDS</span><span class="o">,</span>
+              <span class="k">new</span> <span class="nf">DelayedWorkQueue</span><span class="o">());</span>
+    <span class="o">}</span>
+
+</code></pre></div></div>
+<h2 id="fixedrate-amp-fixeddealy">FixedRate &amp; FixedDealy</h2>
+<ul>
+<li>调度中的FixedRate指的是任务以固定时间频率执行（本次任务开始执行时间和下次任务开始执行时间是固定的）</li>
+<li>调度中的FixedDelay指的是任务结束后以固定间隔执行下一个任务（本次任务执行完成后和下次任务开始执行间隔是固定的，下次任务执行时间不固定，取决于上次任务结束时间）</li>
+<li>Executors.newScheduledThreadPool FixedRate方式执行时，如果前一个任务执行时间太长，后一个任务顺延，不会并发执行。参考下面源码。</li>
+<li>Timer的scheduleAtFixedRate如果任务执行时间&gt;时间间隔，会并发执行</li>
+</ul>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="cm">/**
+     * Creates and executes a periodic action that becomes enabled first
+     * after the given initial delay, and subsequently with the given
+     * period; that is executions will commence after
+     * {@code initialDelay} then {@code initialDelay+period}, then
+     * {@code initialDelay + 2 * period}, and so on.
+     * If any execution of the task
+     * encounters an exception, subsequent executions are suppressed.
+     * Otherwise, the task will only terminate via cancellation or
+     * termination of the executor.  If any execution of this task
+     * takes longer than its period, then subsequent executions
+     * may start late, but will not concurrently execute.
+     *
+     * @param command the task to execute
+     * @param initialDelay the time to delay first execution
+     * @param period the period between successive executions
+     * @param unit the time unit of the initialDelay and period parameters
+     * @return a ScheduledFuture representing pending completion of
+     *         the task, and whose {@code get()} method will throw an
+     *         exception upon cancellation
+     * @throws RejectedExecutionException if the task cannot be
+     *         scheduled for execution
+     * @throws NullPointerException if command is null
+     * @throws IllegalArgumentException if period less than or equal to zero
+     */</span>
+    <span class="kd">public</span> <span class="nc">ScheduledFuture</span><span class="o">&lt;?&gt;</span> <span class="n">scheduleAtFixedRate</span><span class="o">(</span><span class="nc">Runnable</span> <span class="n">command</span><span class="o">,</span>
+                                                  <span class="kt">long</span> <span class="n">initialDelay</span><span class="o">,</span>
+                                                  <span class="kt">long</span> <span class="n">period</span><span class="o">,</span>
+                                                  <span class="nc">TimeUnit</span> <span class="n">unit</span><span class="o">);</span>
+</code></pre></div></div>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="cm">/**
+     * Schedules the specified task for repeated &lt;i&gt;fixed-rate execution&lt;/i&gt;,
+     * beginning after the specified delay.  Subsequent executions take place
+     * at approximately regular intervals, separated by the specified period.
+     *
+     * &lt;p&gt;In fixed-rate execution, each execution is scheduled relative to the
+     * scheduled execution time of the initial execution.  If an execution is
+     * delayed for any reason (such as garbage collection or other background
+     * activity), two or more executions will occur in rapid succession to
+     * "catch up."  In the long run, the frequency of execution will be
+     * exactly the reciprocal of the specified period (assuming the system
+     * clock underlying &lt;tt&gt;Object.wait(long)&lt;/tt&gt; is accurate).
+     *
+     * &lt;p&gt;Fixed-rate execution is appropriate for recurring activities that
+     * are sensitive to &lt;i&gt;absolute&lt;/i&gt; time, such as ringing a chime every
+     * hour on the hour, or running scheduled maintenance every day at a
+     * particular time.  It is also appropriate for recurring activities
+     * where the total time to perform a fixed number of executions is
+     * important, such as a countdown timer that ticks once every second for
+     * ten seconds.  Finally, fixed-rate execution is appropriate for
+     * scheduling multiple repeating timer tasks that must remain synchronized
+     * with respect to one another.
+     *
+     * @param task   task to be scheduled.
+     * @param delay  delay in milliseconds before task is to be executed.
+     * @param period time in milliseconds between successive task executions.
+     * @throws IllegalArgumentException if {@code delay &lt; 0}, or
+     *         {@code delay + System.currentTimeMillis() &lt; 0}, or
+     *         {@code period &lt;= 0}
+     * @throws IllegalStateException if task was already scheduled or
+     *         cancelled, timer was cancelled, or timer thread terminated.
+     * @throws NullPointerException if {@code task} is null
+     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">scheduleAtFixedRate</span><span class="o">(</span><span class="nc">TimerTask</span> <span class="n">task</span><span class="o">,</span> <span class="kt">long</span> <span class="n">delay</span><span class="o">,</span> <span class="kt">long</span> <span class="n">period</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">delay</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="o">)</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"Negative delay."</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">period</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="o">)</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"Non-positive period."</span><span class="o">);</span>
+        <span class="n">sched</span><span class="o">(</span><span class="n">task</span><span class="o">,</span> <span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()+</span><span class="n">delay</span><span class="o">,</span> <span class="n">period</span><span class="o">);</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2018/06/10/jdk-scheduler/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)">TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

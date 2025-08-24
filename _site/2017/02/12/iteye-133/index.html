@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Transaction Attribute &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/02/12/iteye-133/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="Transaction Attribute">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="        2. Spring Framework 支持的事务属性 1） PROPAGATION_REQUIRED --支持当前的事务，如果不存在就创建一个新的。这是最常用的选择。 2） PROPAGATION_SUPPORTS --支持当前的事务，如果不存在就不使用事务。 3） PROPAGATION_MANDATORY --支持当前的事务，如果不存在就抛出异常。 4）PROPAGATION_REQUIRES_NEW --创建一个新的事务，并暂停当前的事务（如果存在）。 5） PROPAGATION_NOT_SUPPORTED --不使用事务，并暂停当前的事务（如果存在）。 6） PROPAGATION_NEVER --不使用事务，如果当前存在事务就抛出异常。 7） PROPAGATION_NESTED --如果当前存在事务就作为嵌入事务执行，否则与PROPAGATION_REQUIRED类似。     3. 注意事项   1）PROPAGATION_REQUIRES_NEW 与 PROPAGATION_NESTED      PROPAGATION_REQUIRES_NEW 启动一个新的, 不依赖于环境的 &quot;内部&quot; 事务. 这个事务将被完全 commited 或 rolled back 而不依赖于外部事务, 它拥有自己的隔离范围, 自己的锁, 等等. 当内部事务开始执行时, 外部事务将被挂起, 内务事务结束时, 外部事务将继续执行.      另一方面, PROPAGATION_NESTED 开始一个 &quot;嵌套的&quot; 事务,  它是已经存在事务的一个真正的子事务. 潜套事务开始执行时,  它将取得一个 savepoint. 如果这个嵌套事务失败, 我们将回滚到此 savepoint. 潜套事务是外部事务的一部分, 只有外部事务结束后它才会被提交. Savepoint需要最新的JDBC规范来支持。JDBC3?     由此可见, PROPAGATION_REQUIRES_NEW 和 PROPAGATION_NESTED 的最大区别在于, PROPAGATION_REQUIRES_NEW 完全是一个新的事务, 而 PROPAGATION_NESTED 则是外部事务的子事务, 如果外部事务 commit, 嵌套事务也会被 commit, 这个规则同样适用于 roll back.   2）Required和mandatory事务属性 一般写操作配置成这两种事务。 两种都支持transaction context. 区别在如果调用时没有transaction context, Required的会发起一个新的事务。而mandatory的会抛出异常。   深层次的区别基于下面的规则： With the exception of the stateful session bean, the method that starts a transaction must be the same method that terminates the transaction.   因为Required不能确认事务是否是在此方法中启动的还是从外面传进来的，因此不知道是否该做rollback这种处理当出现异常时。而Mandatory确认事务都是从外面传入的，因此知道自己不需要处理这种逻辑。   也就是说，如果事务不是在该层发起(客户端发起传入的），那么该层写操作就配置成Mandatory属性，要求调用方必须传入Transaction context；反之事务发起的层写操作应该设成required, 因为它可以控制事务的发起，回滚，提交等。">
+    <meta name="og:description" content="        2. Spring Framework 支持的事务属性 1） PROPAGATION_REQUIRED --支持当前的事务，如果不存在就创建一个新的。这是最常用的选择。 2） PROPAGATION_SUPPORTS --支持当前的事务，如果不存在就不使用事务。 3） PROPAGATION_MANDATORY --支持当前的事务，如果不存在就抛出异常。 4）PROPAGATION_REQUIRES_NEW --创建一个新的事务，并暂停当前的事务（如果存在）。 5） PROPAGATION_NOT_SUPPORTED --不使用事务，并暂停当前的事务（如果存在）。 6） PROPAGATION_NEVER --不使用事务，如果当前存在事务就抛出异常。 7） PROPAGATION_NESTED --如果当前存在事务就作为嵌入事务执行，否则与PROPAGATION_REQUIRED类似。     3. 注意事项   1）PROPAGATION_REQUIRES_NEW 与 PROPAGATION_NESTED      PROPAGATION_REQUIRES_NEW 启动一个新的, 不依赖于环境的 &quot;内部&quot; 事务. 这个事务将被完全 commited 或 rolled back 而不依赖于外部事务, 它拥有自己的隔离范围, 自己的锁, 等等. 当内部事务开始执行时, 外部事务将被挂起, 内务事务结束时, 外部事务将继续执行.      另一方面, PROPAGATION_NESTED 开始一个 &quot;嵌套的&quot; 事务,  它是已经存在事务的一个真正的子事务. 潜套事务开始执行时,  它将取得一个 savepoint. 如果这个嵌套事务失败, 我们将回滚到此 savepoint. 潜套事务是外部事务的一部分, 只有外部事务结束后它才会被提交. Savepoint需要最新的JDBC规范来支持。JDBC3?     由此可见, PROPAGATION_REQUIRES_NEW 和 PROPAGATION_NESTED 的最大区别在于, PROPAGATION_REQUIRES_NEW 完全是一个新的事务, 而 PROPAGATION_NESTED 则是外部事务的子事务, 如果外部事务 commit, 嵌套事务也会被 commit, 这个规则同样适用于 roll back.   2）Required和mandatory事务属性 一般写操作配置成这两种事务。 两种都支持transaction context. 区别在如果调用时没有transaction context, Required的会发起一个新的事务。而mandatory的会抛出异常。   深层次的区别基于下面的规则： With the exception of the stateful session bean, the method that starts a transaction must be the same method that terminates the transaction.   因为Required不能确认事务是否是在此方法中启动的还是从外面传进来的，因此不知道是否该做rollback这种处理当出现异常时。而Mandatory确认事务都是从外面传入的，因此知道自己不需要处理这种逻辑。   也就是说，如果事务不是在该层发起(客户端发起传入的），那么该层写操作就配置成Mandatory属性，要求调用方必须传入Transaction context；反之事务发起的层写操作应该设成required, 因为它可以控制事务的发起，回滚，提交等。">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/02/12/iteye-133/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-02-12">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Transaction Att">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Transaction Attribute</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/02/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#iteye" title="iteye">iteye</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>        2. Spring Framework 支持的事务属性 1） PROPAGATION_REQUIRED --支持当前的事务，如果不存在就创建一个新的。这是最常用的选择。 2） PROPAGATION_SUPPORTS --支持当前的事务，如果不存在就不使用事务。 3） PROPAGATION_MANDATORY --支持当前的事务，如果不存在就抛出异常。 4）PROPAGATION_REQUIRES_NEW --创建一个新的事务，并暂停当前的事务（如果存在）。 5） PROPAGATION_NOT_SUPPORTED --不使用事务，并暂停当前的事务（如果存在）。 6） PROPAGATION_NEVER --不使用事务，如果当前存在事务就抛出异常。 7） PROPAGATION_NESTED --如果当前存在事务就作为嵌入事务执行，否则与PROPAGATION_REQUIRED类似。     3. 注意事项   1）PROPAGATION_REQUIRES_NEW 与 PROPAGATION_NESTED      PROPAGATION_REQUIRES_NEW 启动一个新的, 不依赖于环境的 &quot;内部&quot; 事务. 这个事务将被完全 commited 或 rolled back 而不依赖于外部事务, 它拥有自己的隔离范围, 自己的锁, 等等. 当内部事务开始执行时, 外部事务将被挂起, 内务事务结束时, 外部事务将继续执行.      另一方面, PROPAGATION_NESTED 开始一个 &quot;嵌套的&quot; 事务,  它是已经存在事务的一个真正的子事务. 潜套事务开始执行时,  它将取得一个 savepoint. 如果这个嵌套事务失败, 我们将回滚到此 savepoint. 潜套事务是外部事务的一部分, 只有外部事务结束后它才会被提交. Savepoint需要最新的JDBC规范来支持。JDBC3?     由此可见, PROPAGATION_REQUIRES_NEW 和 PROPAGATION_NESTED 的最大区别在于, PROPAGATION_REQUIRES_NEW 完全是一个新的事务, 而 PROPAGATION_NESTED 则是外部事务的子事务, 如果外部事务 commit, 嵌套事务也会被 commit, 这个规则同样适用于 roll back.   2）Required和mandatory事务属性 一般写操作配置成这两种事务。 两种都支持transaction context. 区别在如果调用时没有transaction context, Required的会发起一个新的事务。而mandatory的会抛出异常。   深层次的区别基于下面的规则： With the exception of the stateful session bean, the method that starts a transaction must be the same method that terminates the transaction.   因为Required不能确认事务是否是在此方法中启动的还是从外面传进来的，因此不知道是否该做rollback这种处理当出现异常时。而Mandatory确认事务都是从外面传入的，因此知道自己不需要处理这种逻辑。   也就是说，如果事务不是在该层发起(客户端发起传入的），那么该层写操作就配置成Mandatory属性，要求调用方必须传入Transaction context；反之事务发起的层写操作应该设成required, 因为它可以控制事务的发起，回滚，提交等。</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/02/12/iteye-133/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Securerandom Aes &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/08/31/SecureRandom-AES/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="Securerandom Aes">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="AES 加密">
+    <meta name="og:description" content="AES 加密">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/08/31/SecureRandom-AES/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-08-31">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Securerandom Ae">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Securerandom Aes</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/08/31
+          </span>
+          
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths">
+    <article class="article-content markdown-body">
+    <h2 id="aes-">AES 加密</h2>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="cm">/** 
+ * 加密 
+ *  
+ * @param content 需要加密的内容 
+ * @param password  加密密码 
+ * @return 
+ */</span>  
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">byte</span><span class="o">[]</span> <span class="nf">encrypt</span><span class="o">(</span><span class="nc">String</span> <span class="n">content</span><span class="o">,</span> <span class="nc">String</span> <span class="n">password</span><span class="o">)</span> <span class="o">{</span>  
+        <span class="k">try</span> <span class="o">{</span>             
+                <span class="nc">KeyGenerator</span> <span class="n">kgen</span> <span class="o">=</span> <span class="nc">KeyGenerator</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">"AES"</span><span class="o">);</span>  
+                <span class="n">kgen</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="mi">128</span><span class="o">,</span> <span class="k">new</span> <span class="nc">SecureRandom</span><span class="o">(</span><span class="n">password</span><span class="o">.</span><span class="na">getBytes</span><span class="o">()));</span>  
+                <span class="nc">SecretKey</span> <span class="n">secretKey</span> <span class="o">=</span> <span class="n">kgen</span><span class="o">.</span><span class="na">generateKey</span><span class="o">();</span>  
+                <span class="kt">byte</span><span class="o">[]</span> <span class="n">enCodeFormat</span> <span class="o">=</span> <span class="n">secretKey</span><span class="o">.</span><span class="na">getEncoded</span><span class="o">();</span>  
+                <span class="nc">SecretKeySpec</span> <span class="n">key</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">SecretKeySpec</span><span class="o">(</span><span class="n">enCodeFormat</span><span class="o">,</span> <span class="s">"AES"</span><span class="o">);</span>  
+                <span class="nc">Cipher</span> <span class="n">cipher</span> <span class="o">=</span> <span class="nc">Cipher</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">"AES"</span><span class="o">);</span><span class="c1">// 创建密码器  </span>
+                <span class="kt">byte</span><span class="o">[]</span> <span class="n">byteContent</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="na">getBytes</span><span class="o">(</span><span class="s">"utf-8"</span><span class="o">);</span>  
+                <span class="n">cipher</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="nc">Cipher</span><span class="o">.</span><span class="na">ENCRYPT_MODE</span><span class="o">,</span> <span class="n">key</span><span class="o">);</span><span class="c1">// 初始化  </span>
+                <span class="kt">byte</span><span class="o">[]</span> <span class="n">result</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="na">doFinal</span><span class="o">(</span><span class="n">byteContent</span><span class="o">);</span>  
+                <span class="k">return</span> <span class="n">result</span><span class="o">;</span> <span class="c1">// 加密  </span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">NoSuchAlgorithmException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>  
+                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>  
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">NoSuchPaddingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>  
+                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>  
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">InvalidKeyException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>  
+                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>  
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">UnsupportedEncodingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>  
+                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>  
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">IllegalBlockSizeException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>  
+                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>  
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">BadPaddingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>  
+                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>  
+        <span class="o">}</span>  
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>  
+<span class="o">}</span> 
+</code></pre></div></div>
+<h2 id="aes">AES解密</h2>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**解密 
+ * @param content  待解密内容 
+ * @param password 解密密钥 
+ * @return 
+ */</span>  
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">byte</span><span class="o">[]</span> <span class="nf">decrypt</span><span class="o">(</span><span class="kt">byte</span><span class="o">[]</span> <span class="n">content</span><span class="o">,</span> <span class="nc">String</span> <span class="n">password</span><span class="o">)</span> <span class="o">{</span>  
+        <span class="k">try</span> <span class="o">{</span>  
+                 <span class="nc">KeyGenerator</span> <span class="n">kgen</span> <span class="o">=</span> <span class="nc">KeyGenerator</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">"AES"</span><span class="o">);</span>  
+                 <span class="n">kgen</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="mi">128</span><span class="o">,</span> <span class="k">new</span> <span class="nc">SecureRandom</span><span class="o">(</span><span class="n">password</span><span class="o">.</span><span class="na">getBytes</span><span class="o">()));</span>  
+                 <span class="nc">SecretKey</span> <span class="n">secretKey</span> <span class="o">=</span> <span class="n">kgen</span><span class="o">.</span><span class="na">generateKey</span><span class="o">();</span>  
+                 <span class="kt">byte</span><span class="o">[]</span> <span class="n">enCodeFormat</span> <span class="o">=</span> <span class="n">secretKey</span><span class="o">.</span><span class="na">getEncoded</span><span class="o">();</span>  
+                 <span class="nc">SecretKeySpec</span> <span class="n">key</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">SecretKeySpec</span><span class="o">(</span><span class="n">enCodeFormat</span><span class="o">,</span> <span class="s">"AES"</span><span class="o">);</span>              
+                 <span class="nc">Cipher</span> <span class="n">cipher</span> <span class="o">=</span> <span class="nc">Cipher</span><span class="o">.</span><span class="na">getInstance</span><span class="o">(</span><span class="s">"AES"</span><span class="o">);</span><span class="c1">// 创建密码器  </span>
+                <span class="n">cipher</span><span class="o">.</span><span class="na">init</span><span class="o">(</span><span class="nc">Cipher</span><span class="o">.</span><span class="na">DECRYPT_MODE</span><span class="o">,</span> <span class="n">key</span><span class="o">);</span><span class="c1">// 初始化  </span>
+                <span class="kt">byte</span><span class="o">[]</span> <span class="n">result</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="na">doFinal</span><span class="o">(</span><span class="n">content</span><span class="o">);</span>  
+                <span class="k">return</span> <span class="n">result</span><span class="o">;</span> <span class="c1">// 加密  </span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">NoSuchAlgorithmException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>  
+                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>  
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">NoSuchPaddingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>  
+                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>  
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">InvalidKeyException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>  
+                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>  
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">IllegalBlockSizeException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>  
+                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>  
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">BadPaddingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>  
+                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>  
+        <span class="o">}</span>  
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>  
+<span class="o">}</span>  
+
+</code></pre></div></div>
+<h2 id="section">分析</h2>
+<p>该加解密算法<strong>SecureRandom</strong>存在坑。在不同平台window／linux，不同jdk 6/7/8， 不同系统配置时多台分布式服务器参加加解密时可能会出现：在一台服务加密的文件在另外一台服务器上不能解密。</p>
+<p>原因跟SecureRandom实现的PRNG随机算法有关。PRNG是Java加密服务提供商（CSP）的一部分。在Sun的Java实现中，默认情况下使用SUN CSP。在Windows上，SUN CSP默认使用在sun.security.provider.SecureRandom中实现的<strong>SHA1PRNG</strong>。在Solaris和Linux上，SUN CSP默认是使用sun.security.provider.<strong>NativePRNG</strong>，它只提供操作系统提供的/dev/urandomPRNG 的输出。</p>
+<p>经测试，指定SecureRandom算法SHA1PRNG没有问题。在我们环境（linux／jdk6/8）中没有显式指定默认走NativePRNG。SecureRandom默认算法选择逻辑：</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     <span class="kd">static</span> <span class="kt">void</span> <span class="nc">More</span> <span class="o">...</span><span class="na">putEntries</span><span class="o">(</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">Object</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">map</span><span class="o">)</span> <span class="o">{</span>
+<span class="mi">86</span> 
+<span class="mi">87</span>         <span class="cm">/*
+88          * SecureRandom
+89          *
+90          * Register these first to speed up "new SecureRandom()",
+91          * which iterates through the list of algorithms
+92          */</span>
+<span class="mi">93</span>         <span class="c1">// register the native PRNG, if available</span>
+<span class="mi">94</span>         <span class="c1">// if user selected /dev/urandom, we put it before SHA1PRNG,</span>
+<span class="mi">95</span>         <span class="c1">// otherwise after it</span>
+<span class="mi">96</span>         <span class="kt">boolean</span> <span class="n">nativeAvailable</span> <span class="o">=</span> <span class="nc">NativePRNG</span><span class="o">.</span><span class="na">isAvailable</span><span class="o">();</span>
+<span class="mi">97</span>         <span class="kt">boolean</span> <span class="n">useNativePRNG</span> <span class="o">=</span> <span class="n">seedSource</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="no">URL_DEV_URANDOM</span><span class="o">)</span> <span class="o">||</span>
+<span class="mi">98</span>             <span class="n">seedSource</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="no">URL_DEV_RANDOM</span><span class="o">);</span>
+<span class="mi">99</span> 
+<span class="mi">100</span>        <span class="k">if</span> <span class="o">(</span><span class="n">nativeAvailable</span> <span class="o">&amp;&amp;</span> <span class="n">useNativePRNG</span><span class="o">)</span> <span class="o">{</span>
+<span class="mi">101</span>            <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"SecureRandom.NativePRNG"</span><span class="o">,</span>
+<span class="mi">102</span>                <span class="s">"sun.security.provider.NativePRNG"</span><span class="o">);</span>
+<span class="mi">103</span>        <span class="o">}</span>
+<span class="mi">104</span>        <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"SecureRandom.SHA1PRNG"</span><span class="o">,</span>
+<span class="mi">105</span>             <span class="s">"sun.security.provider.SecureRandom"</span><span class="o">);</span>
+<span class="mi">106</span>        <span class="k">if</span> <span class="o">(</span><span class="n">nativeAvailable</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">useNativePRNG</span><span class="o">)</span> <span class="o">{</span>
+<span class="mi">107</span>            <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"SecureRandom.NativePRNG"</span><span class="o">,</span>
+<span class="mi">108</span>                <span class="s">"sun.security.provider.NativePRNG"</span><span class="o">);</span>
+<span class="mi">109</span>        <span class="o">}</span>
+  
+  		  <span class="o">......</span>
+
+</code></pre></div></div>
+<p>从上面可以看出，linux下指定了/dev/urandom或者/dev/random采用优先级高的NativePRNG。否则SHA1PRNG优先级高。</p>
+<p>至于通过-Djava.security.egd=file:/dev/./urandom 而不是 <strong>file:/dev/urandom</strong> 那又是另外一个忧伤的故事。<a href="http://blog.csdn.net/raintungli/article/details/42876073">http://blog.csdn.net/raintungli/article/details/42876073</a></p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/08/31/SecureRandom-AES/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)">TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

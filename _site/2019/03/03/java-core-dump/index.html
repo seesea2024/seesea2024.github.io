@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Java Core Dump &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2019/03/03/java-core-dump/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="Java Core Dump">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="Java Core Dump分析">
+    <meta name="og:description" content="Java Core Dump分析">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2019/03/03/java-core-dump/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2019-03-03">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Java Core Dump">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Java Core Dump</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2019/03/03
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#JVM" title="JVM">JVM</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>Java Core Dump分析</p>
+<p>Java程序运行时，有时会产生hs_err_pid<pid>.log及core Dump文件。发生core dump后，Java进程有时可以继续运行，但有时会挂掉。core dump文件保留了Java应用发生致命错误前的运行状态</p>
+<h2 id="core-dump">如何生成core dump文件</h2>
+<pre><code>echo /var/tmp/cores/%e-%p-%t.core &gt; /proc/sys/kernel/core_pattern
+</code></pre><pre><code>-XX:ErrorFile=./hs_err_pid&lt;pid&gt;.log
+</code></pre>
+<h2 id="section">生成的文件</h2>
+<h3 id="java-pid-unixcore">二进制文件 java-[pid]-[unix时间].core</h3>
+<p>获取文件位置</p>
+<pre><code>$ cat /proc/sys/kernel/core_pattern
+/var/tmp/cores/%e-%p-%u.core
+$ ls /var/tmp/cores
+java-21178-146385.core
+</code></pre><pre><code># 
+# A fatal error has been detected by the Java Runtime Environment: 
+# 
+# SIGBUS (0x7) at pc=0x00007fde40016a32, pid=7808, tid=0x00007fde4075b700 
+# 
+# JRE version: Java(TM) SE Runtime Environment (8.0_92-b14) (build 1.8.0_92-b14) 
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (25.92-b14 mixed mode linux-amd64 compressed oops) 
+# Problematic frame: 
+# C [libzip.so+0x11a32] newEntry+0x62 
+# 
+# Failed to write core dump. Core dumps have been disabled. To enable core dumping, try &quot;ulimit -c unlimited&quot; before starting Java again 
+# 
+# If you would like to submit a bug report, please visit: 
+# http://bugreport.java.com/bugreport/crash.jsp 
+# The crash happened outside the Java Virtual Machine in native code. 
+# See problematic frame for where to report the bug. 
+# 
+</code></pre>
+<h3 id="hserrpidpidlog">hs_err_pid[pid].log</h3>
+<ul>
+<li>java应用崩溃日志中可以看到hs_err-pid[pid].log文件位置</li>
+</ul>
+<pre><code>#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+# SIGSEGV (0xb) at pc=0x00000000000010c6, pid=2446, tid=140570273433344
+#
+# JRE version: Java(TM) SE Runtime Environment (8.0_66-b17) (build 1.8.0_66-b17)
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (25.66-b17 mixed mode linux-amd64 compressed oops)
+# Problematic frame:
+# C 0x00000000000010c6
+#
+# Core dump written. Default location: /home/ewallet/quhua/quhua-online/default/tomcat/core or core.2446
+#
+# An error report file with more information is saved as:
+# /home/default/tomcat/hs_err_pid2446.log
+#
+# If you would like to submit a bug report, please visit:
+# http://bugreport.java.com/bugreport/crash.jsp
+#
+</code></pre>
+<ul>
+<li>文本文件 hs_err_pid[pid].log</li>
+</ul>
+<pre><code>#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x0000003797807a91, pid=29071, tid=139901421901568
+#
+# JRE version: Java(TM) SE Runtime Environment (8.0_45-b14) (build 1.8.0_45-b14)
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (25.45-b02 mixed mode linux-amd64 compressed oops)
+# Problematic frame:
+# C  [libresolv.so.2+0x7a91]  __libc_res_nquery+0x1c1
+#
+# Failed to write core dump. Core dumps have been disabled. To enable core dumping, try &quot;ulimit -c unlimited&quot; before starting Java again
+#
+# If you would like to submit a bug report, please visit:
+#   http://bugreport.java.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x0000000001e94800):  JavaThread &quot;pool-1-thread-2&quot; [_thread_in_native, id=30111, stack(0x00007f3d567e5000,0x00007f3d568e6000)]
+
+siginfo: si_signo: 11 (SIGSEGV), si_code: 1 (SEGV_MAPERR), si_addr: 0x0000000000000003
+
+Registers:
+RAX=0x0000000000000000, RBX=0x0000000000000000, RCX=0x0000000000000000, RDX=0x0000000000000050
+RSP=0x00007f3d568e2280, RBP=0x00007f3d568e2570, RSI=0x0000000000000000, RDI=0x00000000ffffffff
+R8 =0x0000000000000000, R9 =0x0000000000000000, R10=0x000000000007a337, R11=0x0000000000000213
+R12=0x00007f3d568e2ef0, R13=0x00007f3d568e22b0, R14=0x0000000000000000, R15=0x00007f3d568e5db8
+RIP=0x0000003797807a91, EFLAGS=0x0000000000010246, CSGSFS=0x0000000000000033, ERR=0x0000000000000004
+  TRAPNO=0x000000000000000e
+
+Top of Stack: (sp=0x00007f3d568e2280)
+0x00007f3d568e2280:   b8e4bfb900000800 00007f3d568e3760
+0x00007f3d568e2290:   00007f3d568e3758 00007f3d568e377c
+0x00007f3d568e22a0:   00007f3d568e3778 6f6e6b6e56a88a58
+0x00007f3d568e22b0:   00000100000149a0 7a68710800000000
+0x00007f3d568e22c0:   6970067363642d78 6d6f63036e61676e
+....省略
+
+Instructions: (pc=0x0000003797807a91)
+0x0000003797807a71:   48 89 45 b8 48 8b 4d b8 0f b6 51 03 89 d3 83 e3
+0x0000003797807a81:   0f 75 0d 0f b7 49 06 66 c1 c9 08 66 85 c9 75 4f
+0x0000003797807a91:   0f b6 48 03 bf 0f 00 00 00 40 20 cf 75 0d 0f b7
+0x0000003797807aa1:   70 06 66 c1 ce 08 66 85 f6 75 34 83 e1 0f 83 e2 
+
+Register to memory mapping:
+
+RAX=0x0000000000000000 is an unknown value
+RBX=0x0000000000000000 is an unknown value
+RCX=0x0000000000000000 is an unknown value
+RDX=0x0000000000000050 is an unknown value
+RSP=0x00007f3d568e2280 is pointing into the stack for thread: 0x0000000001e94800
+RBP=0x00007f3d568e2570 is pointing into the stack for thread: 0x0000000001e94800
+... 省略
+
+</code></pre>
+<h2 id="section-1">如何分析</h2>
+<ul>
+<li>
+<p>从hs-err-pid[pid].log文件中获取core dump线程id</p>
+</li>
+<li>
+<p>gdb</p>
+</li>
+</ul>
+<pre><code>(gdb) set solib-search-path $JAVA_HOME/jre/bin/
+(gdb) file $JAVA_HOME/jre/bin/java
+(gdb) core java-230270-1551171676.core
+(gdb) bt
+or 
+(gdb) where
+</code></pre>
+<ul>
+<li>jstack 找到问题线程堆栈</li>
+</ul>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>jstack <span class="nt">-J-d64</span> <span class="nv">$JAVA_HOME</span>/bin/java /var/tmp/cores/java-[pid]-[unix <span class="nb">time</span><span class="o">]</span>.core
+</code></pre></div></div>
+<ul>
+<li>jmap</li>
+</ul>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>jmap <span class="nv">$JAVA_HOME</span>/bin/java /var/tmp/cores/java-[pid]-[unix <span class="nb">time</span><span class="o">]</span>.core
+</code></pre></div></div>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2019/03/03/java-core-dump/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

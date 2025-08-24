@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Eclipse GC log &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/02/12/iteye-9/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="Eclipse GC log">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="为了查看Eclipse GC log，需要在eclipse.ini 中加入-XX:+PrintGCTimeStamps-XX:+PrintGCDetails-verbose:gc-Xloggc:gc.log     在Eclipse安装目录查看gc.log9.768: [Full GC 9.769: [Tenured: 7678K-&gt;9025K(27328K), 0.3117731 secs] 9172K-&gt;9025K(39616K), [Perm : 16383K-&gt;16383K(16384K)], 0.3122537 secs]从上面的日志看似有perm 区(16384K)满引起的Full GC, 需要增大perm区空间和初始空间    -XX:PermSize=64m-XX:MaxPermSize=64m    再重启Eclipse有如下log1.338: [GC 1.338: [DefNew: 10944K-&gt;1028K(12288K), 0.0223470 secs] 10944K-&gt;1028K(39616K), 0.0224436 secs] [Times: user=0.03 sys=0.00, real=0.03 secs]  2.053: [GC 2.053: [DefNew: 11972K-&gt;434K(12288K), 0.0159322 secs] 11972K-&gt;1431K(39616K), 0.0161071 secs] [Times: user=0.01 sys=0.00, real=0.02 secs] 2.923: [GC 2.923: [DefNew: 11378K-&gt;1048K(12288K), 0.0192125 secs] 12375K-&gt;2044K(39616K), 0.0193916 secs]     貌似初始yong 区空间小了引起yong GC，让初始堆空间跟最大堆空间一样大（yong区应该也会按比例增大吧），GC消除了。  最终eclipse.ini如下    -startupplugins/org.eclipse.equinox.launcher_1.1.1.R36x_v20101122_1400.jar--launcher.libraryplugins/org.eclipse.equinox.launcher.win32.win32.x86_1.1.2.R36x_v20101222-productorg.eclipse.epp.package.java.product--launcher.XXMaxPermSize256M-showsplashorg.eclipse.platform--launcher.defaultActionopenFile-vmargs-Dosgi.requiredJavaVersion=1.5-Xms384m-Xmx384m-XX:PermSize=64m-XX:MaxPermSize=64m-XX:+PrintGCTimeStamps-XX:+PrintGCDetails-verbose:gc-Xloggc:gc.log   有趣的是关掉Eclipse会看到如下的log20.639: [GC 20.639: [DefNew: 104960K-&gt;12258K(118016K), 0.2109056 secs] 104960K-&gt;12258K(380160K), 0.2110277 secs] [Times: user=0.20 sys=0.00, real=0.20 secs]  31.909: [GC 31.909: [DefNew: 117218K-&gt;7351K(118016K), 0.2577353 secs] 117218K-&gt;19392K(380160K), 0.2578431 secs] [Times: user=0.24 sys=0.00, real=0.25 secs]  Heap  def new generation   total 118016K, used 37344K [0x02b00000, 0x0ab00000, 0x0ab00000)   eden space 104960K,  28% used [0x02b00000, 0x0484a4c0, 0x09180000)   from space 13056K,  56% used [0x09180000, 0x098add90, 0x09e40000)   to   space 13056K,   0% used [0x09e40000, 0x09e40000, 0x0ab00000)  tenured generation   total 262144K, used 12041K [0x0ab00000, 0x1ab00000, 0x1ab00000)    the space 262144K,   4% used [0x0ab00000, 0x0b6c25c0, 0x0b6c2600, 0x1ab00000)  compacting perm gen  total 65536K, used 36982K [0x1ab00000, 0x1eb00000, 0x1eb00000)    the space 65536K,  56% used [0x1ab00000, 0x1cf1d8e0, 0x1cf1da00, 0x1eb00000) No shared spaces configured. 是什么触发了yong GC？关Eclipse时需要创建对象引起GC释放更多的对象？Yong 区空间118016K + tenured 空间262144K = 380160K, 这约等于我们Xms/Xmx设置的空间。所以xms/xmx大小不包括perm区空间  ">
+    <meta name="og:description" content="为了查看Eclipse GC log，需要在eclipse.ini 中加入-XX:+PrintGCTimeStamps-XX:+PrintGCDetails-verbose:gc-Xloggc:gc.log     在Eclipse安装目录查看gc.log9.768: [Full GC 9.769: [Tenured: 7678K-&gt;9025K(27328K), 0.3117731 secs] 9172K-&gt;9025K(39616K), [Perm : 16383K-&gt;16383K(16384K)], 0.3122537 secs]从上面的日志看似有perm 区(16384K)满引起的Full GC, 需要增大perm区空间和初始空间    -XX:PermSize=64m-XX:MaxPermSize=64m    再重启Eclipse有如下log1.338: [GC 1.338: [DefNew: 10944K-&gt;1028K(12288K), 0.0223470 secs] 10944K-&gt;1028K(39616K), 0.0224436 secs] [Times: user=0.03 sys=0.00, real=0.03 secs]  2.053: [GC 2.053: [DefNew: 11972K-&gt;434K(12288K), 0.0159322 secs] 11972K-&gt;1431K(39616K), 0.0161071 secs] [Times: user=0.01 sys=0.00, real=0.02 secs] 2.923: [GC 2.923: [DefNew: 11378K-&gt;1048K(12288K), 0.0192125 secs] 12375K-&gt;2044K(39616K), 0.0193916 secs]     貌似初始yong 区空间小了引起yong GC，让初始堆空间跟最大堆空间一样大（yong区应该也会按比例增大吧），GC消除了。  最终eclipse.ini如下    -startupplugins/org.eclipse.equinox.launcher_1.1.1.R36x_v20101122_1400.jar--launcher.libraryplugins/org.eclipse.equinox.launcher.win32.win32.x86_1.1.2.R36x_v20101222-productorg.eclipse.epp.package.java.product--launcher.XXMaxPermSize256M-showsplashorg.eclipse.platform--launcher.defaultActionopenFile-vmargs-Dosgi.requiredJavaVersion=1.5-Xms384m-Xmx384m-XX:PermSize=64m-XX:MaxPermSize=64m-XX:+PrintGCTimeStamps-XX:+PrintGCDetails-verbose:gc-Xloggc:gc.log   有趣的是关掉Eclipse会看到如下的log20.639: [GC 20.639: [DefNew: 104960K-&gt;12258K(118016K), 0.2109056 secs] 104960K-&gt;12258K(380160K), 0.2110277 secs] [Times: user=0.20 sys=0.00, real=0.20 secs]  31.909: [GC 31.909: [DefNew: 117218K-&gt;7351K(118016K), 0.2577353 secs] 117218K-&gt;19392K(380160K), 0.2578431 secs] [Times: user=0.24 sys=0.00, real=0.25 secs]  Heap  def new generation   total 118016K, used 37344K [0x02b00000, 0x0ab00000, 0x0ab00000)   eden space 104960K,  28% used [0x02b00000, 0x0484a4c0, 0x09180000)   from space 13056K,  56% used [0x09180000, 0x098add90, 0x09e40000)   to   space 13056K,   0% used [0x09e40000, 0x09e40000, 0x0ab00000)  tenured generation   total 262144K, used 12041K [0x0ab00000, 0x1ab00000, 0x1ab00000)    the space 262144K,   4% used [0x0ab00000, 0x0b6c25c0, 0x0b6c2600, 0x1ab00000)  compacting perm gen  total 65536K, used 36982K [0x1ab00000, 0x1eb00000, 0x1eb00000)    the space 65536K,  56% used [0x1ab00000, 0x1cf1d8e0, 0x1cf1da00, 0x1eb00000) No shared spaces configured. 是什么触发了yong GC？关Eclipse时需要创建对象引起GC释放更多的对象？Yong 区空间118016K + tenured 空间262144K = 380160K, 这约等于我们Xms/Xmx设置的空间。所以xms/xmx大小不包括perm区空间  ">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/02/12/iteye-9/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-02-12">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Eclipse GC log">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Eclipse GC log</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/02/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#iteye" title="iteye">iteye</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>为了查看Eclipse GC log，需要在eclipse.ini 中加入</p>
+<pre><code>-XX:+PrintGCTimeStamps
+-XX:+PrintGCDetails
+-verbose:gc
+-Xloggc:gc.log     
+</code></pre>
+<p>在Eclipse安装目录查看gc.log</p>
+<pre><code>9.768: [Full GC 9.769: [Tenured: 7678K-&gt;9025K(27328K), 0.3117731 secs] 9172K-&gt;9025K(39616K), [Perm : 16383K-&gt;16383K(16384K)], 0.3122537 secs]
+</code></pre>
+<p>从上面的日志看似有perm 区(16384K)满引起的Full GC, 需要增大perm区空间和初始空间    </p>
+<pre><code>-XX:PermSize=64m
+-XX:MaxPermSize=64m    
+</code></pre>
+<p>再重启Eclipse有如下log</p>
+<pre><code>1.338: [GC 1.338: [DefNew: 10944K-&gt;1028K(12288K), 0.0223470 secs] 10944K-&gt;1028K(39616K), 0.0224436 secs] [Times: user=0.03 sys=0.00, real=0.03 secs]  
+2.053: [GC 2.053: [DefNew: 11972K-&gt;434K(12288K), 0.0159322 secs] 11972K-&gt;1431K(39616K), 0.0161071 secs] [Times: user=0.01 sys=0.00, real=0.02 secs] 
+2.923: [GC 2.923: [DefNew: 11378K-&gt;1048K(12288K), 0.0192125 secs] 12375K-&gt;2044K(39616K), 0.0193916 secs]     
+</code></pre>
+<p>貌似初始yong 区空间小了引起yong GC，让初始堆空间跟最大堆空间一样大（yong区应该也会按比例增大吧），GC消除了。  </p>
+<p>最终eclipse.ini如下    </p>
+<pre><code>-startup
+plugins/org.eclipse.equinox.launcher_1.1.1.R36x_v20101122_1400.jar
+--launcher.library
+plugins/org.eclipse.equinox.launcher.win32.win32.x86_1.1.2.R36x_v20101222
+-product
+org.eclipse.epp.package.java.product
+--launcher.XXMaxPermSize
+256M
+-showsplash
+org.eclipse.platform
+--launcher.defaultAction
+openFile
+-vmargs
+-Dosgi.requiredJavaVersion=1.5
+-Xms384m
+-Xmx384m
+-XX:PermSize=64m
+-XX:MaxPermSize=64m
+-XX:+PrintGCTimeStamps
+-XX:+PrintGCDetails
+-verbose:gc
+-Xloggc:gc.log
+</code></pre>
+<p>   
+有趣的是关掉Eclipse会看到如下的log</p>
+<pre><code>20.639: [GC 20.639: [DefNew: 104960K-&gt;12258K(118016K), 0.2109056 secs] 104960K-&gt;12258K(380160K), 0.2110277 secs] [Times: user=0.20 sys=0.00, real=0.20 secs]  
+31.909: [GC 31.909: [DefNew: 117218K-&gt;7351K(118016K), 0.2577353 secs] 117218K-&gt;19392K(380160K), 0.2578431 secs] [Times: user=0.24 sys=0.00, real=0.25 secs]  
+Heap  def new generation   total 118016K, used 37344K [0x02b00000, 0x0ab00000, 0x0ab00000)   
+eden space 104960K,  28% used [0x02b00000, 0x0484a4c0, 0x09180000)   
+from space 13056K,  56% used [0x09180000, 0x098add90, 0x09e40000)   
+to   space 13056K,   0% used [0x09e40000, 0x09e40000, 0x0ab00000)  
+tenured generation   total 262144K, used 12041K [0x0ab00000, 0x1ab00000, 0x1ab00000)    
+the space 262144K,   4% used [0x0ab00000, 0x0b6c25c0, 0x0b6c2600, 0x1ab00000)  
+compacting perm gen  total 65536K, used 36982K [0x1ab00000, 0x1eb00000, 0x1eb00000)    
+the space 65536K,  56% used [0x1ab00000, 0x1cf1d8e0, 0x1cf1da00, 0x1eb00000) 
+No shared spaces configured. 
+</code></pre>
+<ol>
+<li>是什么触发了yong GC？关Eclipse时需要创建对象引起GC释放更多的对象？</li>
+<li>Yong 区空间118016K + tenured 空间262144K = 380160K, 这约等于我们Xms/Xmx设置的空间。所以xms/xmx大小不包括perm区空间  </li>
+</ol>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/02/12/iteye-9/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

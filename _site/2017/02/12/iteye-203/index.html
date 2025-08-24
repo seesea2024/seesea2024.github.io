@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Oracle索引 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/02/12/iteye-203/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="Oracle索引">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="oracle的索引陷阱一个表中有几百万条数据，对某个字段加了索引，但是查询时性能并没有什么提高，这主要可能是oracle的索引限制造成的。 oracle的索引有一些索引限制，在这些索引限制发生的情况下，即使已经加了索引，oracle还是会执行一次全表扫描，查询的性能不会比不加索引有所提高，反而可能由于数据库维护索引的系统开销造成性能更差。 下面是一些常见的索引限制问题。  使用不等于操作符(&lt;&gt;, !=)下面这种情况，即使在列dept_id有一个索引，查询语句仍然执行一次全表扫描select * from dept where staff_num &lt;&gt; 1000; 但是开发中的确需要这样的查询，难道没有解决问题的办法了吗？ 有！ 通过把用 or 语法替代不等号进行查询，就可以使用索引，以避免全表扫描：上面的语句改成下面这样的，就可以使用索引了。select * from dept shere staff_num &lt; 1000 or dept_id &gt; 1000;  使用 is null 或 is not null使用 is null 或is not null也会限制索引的使用，因为数据库并没有定义null值。如果被索引的列中有很多null，就不会使用这个索引（除非索引是一个位图索引，关于位图索引，会在以后的blog文章里做详细解释）。在sql语句中使用null会造成很多麻烦。 解决这个问题的办法就是：建表时把需要索引的列定义为非空(not null)  使用函数如果没有使用基于函数的索引，那么where子句中对存在索引的列使用函数时，会使优化器忽略掉这些索引。下面的查询就不会使用索引：select * from staff where trunc(birthdate) = '01-MAY-82'; 但是把函数应用在条件上，索引是可以生效的，把上面的语句改成下面的语句，就可以通过索引进行查找。select * from staff where birthdate &lt; (to_date('01-MAY-82') + 0.9999);  比较不匹配的数据类型比较不匹配的数据类型也是难于发现的性能问题之一。 下面的例子中，dept_id是一个varchar2型的字段，在这个字段上有索引，但是下面的语句会执行全表扫描。select * from dept where dept_id = 900198;这是因为oracle会自动把where子句转换成to_number(dept_id)=900198，就是3所说的情况，这样就限制了索引的使用。 把SQL语句改为如下形式就可以使用索引select * from dept where dept_id = '900198';     各种索引使用场合及建议  B*Tree索引常规索引，多用于oltp系统，快速定位行，应建立于高cardinality列（即列的唯一值除以行数为一个很大的值，存在很少的相同值）。  Create index indexname on tablename(columnname[columnname...]) 反向索引。B*Tree的衍生产物，应用于特殊场合，在ops环境加序列增加的列上建立，不适合做区域扫描。 Create index indexname on tablename(columnname[columnname...]) reverse 降序索引。B*Tree的衍生产物，应用于有降序排列的搜索语句中，索引中储存了降序排列的索引码，提供了快速的降序搜索。  Create index indexname on tablename(columnname DESC[columnname...]) 位图索引。位图方式管理的索引，适用于OLAP（在线分析）和DSS（决策处理）系统，应建立于低cardinality列， 适合集中读取，不适合插入和修改，提供比B*Tree索引更节省的空间。 Create BITMAP index indexname on tablename(columnname[columnname...]) 在实际应用中，如果某个字段的值需要频繁更新，那么就不适合在它上面创建位图索引。 在位图索引中，如果你更新或插入其中一条数值为N的记录， 那么相应表中数值为N的记录（可能成百上千条）全部被Oracle锁定， 这就意味着其它用户不能同时更新这些数值为N的记录，其它用户必须要等第一个用户提交后， 才能获得锁，更新或插入数据，bitmap index它主要用于决策支持系统或静态数据。函数索引。B*Tree的衍生产物，应用于查询语句条件列上包含函数的情况， 索引中储存了经过函数计算的索引码值。可以在不修改应用程序的基础上能提高查询效率。索引创建策略导入数据后再创建索引不需要为很小的表创建索引对于取值范围很小的字段（比如性别字段）应当建立位图索引限制表中的索引的数目为索引设置合适的PCTFREE值存储索引的表空间最好单独设定唯一索引和不唯一索引都只是针对B树索引而言. Oracle最多允许包含32个字段的复合索引 由此估计出一个查询如果使用某个索引会需要读入的数据块块数。 需要读入的数据块越多，则 cost 越大，Oracle 也就越有可能不选择使用 index  能用唯一索引，一定用唯一索引 能加非空，就加非空约束 一定要统计表的信息，索引的信息，柱状图的信息。 联合索引的顺序不同，影响索引的选择，尽量将值少的放在前面只有做到以上几点，数据库才会正确的选择执行计划。">
+    <meta name="og:description" content="oracle的索引陷阱一个表中有几百万条数据，对某个字段加了索引，但是查询时性能并没有什么提高，这主要可能是oracle的索引限制造成的。 oracle的索引有一些索引限制，在这些索引限制发生的情况下，即使已经加了索引，oracle还是会执行一次全表扫描，查询的性能不会比不加索引有所提高，反而可能由于数据库维护索引的系统开销造成性能更差。 下面是一些常见的索引限制问题。  使用不等于操作符(&lt;&gt;, !=)下面这种情况，即使在列dept_id有一个索引，查询语句仍然执行一次全表扫描select * from dept where staff_num &lt;&gt; 1000; 但是开发中的确需要这样的查询，难道没有解决问题的办法了吗？ 有！ 通过把用 or 语法替代不等号进行查询，就可以使用索引，以避免全表扫描：上面的语句改成下面这样的，就可以使用索引了。select * from dept shere staff_num &lt; 1000 or dept_id &gt; 1000;  使用 is null 或 is not null使用 is null 或is not null也会限制索引的使用，因为数据库并没有定义null值。如果被索引的列中有很多null，就不会使用这个索引（除非索引是一个位图索引，关于位图索引，会在以后的blog文章里做详细解释）。在sql语句中使用null会造成很多麻烦。 解决这个问题的办法就是：建表时把需要索引的列定义为非空(not null)  使用函数如果没有使用基于函数的索引，那么where子句中对存在索引的列使用函数时，会使优化器忽略掉这些索引。下面的查询就不会使用索引：select * from staff where trunc(birthdate) = '01-MAY-82'; 但是把函数应用在条件上，索引是可以生效的，把上面的语句改成下面的语句，就可以通过索引进行查找。select * from staff where birthdate &lt; (to_date('01-MAY-82') + 0.9999);  比较不匹配的数据类型比较不匹配的数据类型也是难于发现的性能问题之一。 下面的例子中，dept_id是一个varchar2型的字段，在这个字段上有索引，但是下面的语句会执行全表扫描。select * from dept where dept_id = 900198;这是因为oracle会自动把where子句转换成to_number(dept_id)=900198，就是3所说的情况，这样就限制了索引的使用。 把SQL语句改为如下形式就可以使用索引select * from dept where dept_id = '900198';     各种索引使用场合及建议  B*Tree索引常规索引，多用于oltp系统，快速定位行，应建立于高cardinality列（即列的唯一值除以行数为一个很大的值，存在很少的相同值）。  Create index indexname on tablename(columnname[columnname...]) 反向索引。B*Tree的衍生产物，应用于特殊场合，在ops环境加序列增加的列上建立，不适合做区域扫描。 Create index indexname on tablename(columnname[columnname...]) reverse 降序索引。B*Tree的衍生产物，应用于有降序排列的搜索语句中，索引中储存了降序排列的索引码，提供了快速的降序搜索。  Create index indexname on tablename(columnname DESC[columnname...]) 位图索引。位图方式管理的索引，适用于OLAP（在线分析）和DSS（决策处理）系统，应建立于低cardinality列， 适合集中读取，不适合插入和修改，提供比B*Tree索引更节省的空间。 Create BITMAP index indexname on tablename(columnname[columnname...]) 在实际应用中，如果某个字段的值需要频繁更新，那么就不适合在它上面创建位图索引。 在位图索引中，如果你更新或插入其中一条数值为N的记录， 那么相应表中数值为N的记录（可能成百上千条）全部被Oracle锁定， 这就意味着其它用户不能同时更新这些数值为N的记录，其它用户必须要等第一个用户提交后， 才能获得锁，更新或插入数据，bitmap index它主要用于决策支持系统或静态数据。函数索引。B*Tree的衍生产物，应用于查询语句条件列上包含函数的情况， 索引中储存了经过函数计算的索引码值。可以在不修改应用程序的基础上能提高查询效率。索引创建策略导入数据后再创建索引不需要为很小的表创建索引对于取值范围很小的字段（比如性别字段）应当建立位图索引限制表中的索引的数目为索引设置合适的PCTFREE值存储索引的表空间最好单独设定唯一索引和不唯一索引都只是针对B树索引而言. Oracle最多允许包含32个字段的复合索引 由此估计出一个查询如果使用某个索引会需要读入的数据块块数。 需要读入的数据块越多，则 cost 越大，Oracle 也就越有可能不选择使用 index  能用唯一索引，一定用唯一索引 能加非空，就加非空约束 一定要统计表的信息，索引的信息，柱状图的信息。 联合索引的顺序不同，影响索引的选择，尽量将值少的放在前面只有做到以上几点，数据库才会正确的选择执行计划。">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/02/12/iteye-203/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-02-12">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Oracle索引">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Oracle索引</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/02/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#iteye" title="iteye">iteye</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h2 id="oracle">oracle的索引陷阱</h2>
+<p>一个表中有几百万条数据，对某个字段加了索引，但是查询时性能并没有什么提高，这主要可能是oracle的索引限制造成的。 oracle的索引有一些索引限制，在这些索引限制发生的情况下，即使已经加了索引，oracle还是会执行一次全表扫描，查询的性能不会比不加索引有所提高，反而可能由于数据库维护索引的系统开销造成性能更差。 下面是一些常见的索引限制问题。  </p>
+<h3 id="ltgt-">使用不等于操作符(&lt;&gt;, !=)</h3>
+<p>下面这种情况，即使在列dept_id有一个索引，查询语句仍然执行一次全表扫描</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">dept</span> <span class="k">where</span> <span class="n">staff_num</span> <span class="o">&lt;&gt;</span> <span class="mi">1000</span><span class="p">;</span> 
+</code></pre></div></div>
+<p>但是开发中的确需要这样的查询，难道没有解决问题的办法了吗？ 有！ 通过把用 or 语法替代不等号进行查询，就可以使用索引，以避免全表扫描：上面的语句改成下面这样的，就可以使用索引了。</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">dept</span> <span class="n">shere</span> <span class="n">staff_num</span> <span class="o">&lt;</span> <span class="mi">1000</span> <span class="k">or</span> <span class="n">dept_id</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">;</span> <span class="err"> </span>
+</code></pre></div></div>
+<h3 id="is-null--is-not-null">使用 is null 或 is not null</h3>
+<p>使用 is null 或is not null也会限制索引的使用，因为数据库并没有定义null值。如果被索引的列中有很多null，就不会使用这个索引（除非索引是一个位图索引，关于位图索引，会在以后的blog文章里做详细解释）。在sql语句中使用null会造成很多麻烦。 解决这个问题的办法就是：建表时把需要索引的列定义为非空(not null)  </p>
+<h3 id="section">使用函数</h3>
+<p>如果没有使用基于函数的索引，那么where子句中对存在索引的列使用函数时，会使优化器忽略掉这些索引。下面的查询就不会使用索引：</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">staff</span> <span class="k">where</span> <span class="n">trunc</span><span class="p">(</span><span class="n">birthdate</span><span class="p">)</span> <span class="o">=</span> <span class="s1">'01-MAY-82'</span><span class="p">;</span> 
+</code></pre></div></div>
+<p>但是把函数应用在条件上，索引是可以生效的，把上面的语句改成下面的语句，就可以通过索引进行查找。</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">staff</span> <span class="k">where</span> <span class="n">birthdate</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">to_date</span><span class="p">(</span><span class="s1">'01-MAY-82'</span><span class="p">)</span> <span class="o">+</span> <span class="mi">0</span><span class="p">.</span><span class="mi">9999</span><span class="p">);</span> <span class="err"> </span>
+</code></pre></div></div>
+<h3 id="section-1">比较不匹配的数据类型</h3>
+<p>比较不匹配的数据类型也是难于发现的性能问题之一。 下面的例子中，dept_id是一个varchar2型的字段，在这个字段上有索引，但是下面的语句会执行全表扫描。</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">dept</span> <span class="k">where</span> <span class="n">dept_id</span> <span class="o">=</span> <span class="mi">900198</span><span class="p">;</span>
+</code></pre></div></div>
+<p>这是因为oracle会自动把where子句转换成to_number(dept_id)=900198，就是3所说的情况，这样就限制了索引的使用。 把SQL语句改为如下形式就可以使用索引</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">dept</span> <span class="k">where</span> <span class="n">dept_id</span> <span class="o">=</span> <span class="s1">'900198'</span><span class="p">;</span> <span class="err"> </span> <span class="err"> </span>
+</code></pre></div></div>
+<h2 id="section-2"> 各种索引使用场合及建议  </h2>
+<h3 id="btree">B*Tree索引</h3>
+<p>常规索引，多用于oltp系统，快速定位行，应建立于高cardinality列（即列的唯一值除以行数为一个很大的值，存在很少的相同值）。  </p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Create</span> <span class="k">index</span> <span class="n">indexname</span> <span class="k">on</span> <span class="n">tablename</span><span class="p">(</span><span class="n">columnname</span><span class="p">[</span><span class="n">columnname</span><span class="p">...])</span> 
+</code></pre></div></div>
+<h3 id="section-3">反向索引。</h3>
+<p>B*Tree的衍生产物，应用于特殊场合，在ops环境加序列增加的列上建立，不适合做区域扫描。</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err"> </span><span class="k">Create</span> <span class="k">index</span> <span class="n">indexname</span> <span class="k">on</span> <span class="n">tablename</span><span class="p">(</span><span class="n">columnname</span><span class="p">[</span><span class="n">columnname</span><span class="p">...])</span> <span class="n">reverse</span> 
+</code></pre></div></div>
+<h3 id="section-4">降序索引。</h3>
+<p>B*Tree的衍生产物，应用于有降序排列的搜索语句中，索引中储存了降序排列的索引码，提供了快速的降序搜索。  </p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">Create</span> <span class="k">index</span> <span class="n">indexname</span> <span class="k">on</span> <span class="n">tablename</span><span class="p">(</span><span class="n">columnname</span> <span class="k">DESC</span><span class="p">[</span><span class="n">columnname</span><span class="p">...])</span> 
+</code></pre></div></div>
+<h3 id="section-5">位图索引。</h3>
+<p>位图方式管理的索引，适用于OLAP（在线分析）和DSS（决策处理）系统，应建立于低cardinality列， 适合集中读取，不适合插入和修改，提供比B*Tree索引更节省的空间。</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err"> </span><span class="k">Create</span> <span class="n">BITMAP</span> <span class="k">index</span> <span class="n">indexname</span> <span class="k">on</span> <span class="n">tablename</span><span class="p">(</span><span class="n">columnname</span><span class="p">[</span><span class="n">columnname</span><span class="p">...])</span> 
+</code></pre></div></div>
+<p>在实际应用中，如果某个字段的值需要频繁更新，那么就不适合在它上面创建位图索引。 在位图索引中，如果你更新或插入其中一条数值为N的记录， 那么相应表中数值为N的记录（可能成百上千条）全部被Oracle锁定， 这就意味着其它用户不能同时更新这些数值为N的记录，其它用户必须要等第一个用户提交后， 才能获得锁，更新或插入数据，bitmap index它主要用于决策支持系统或静态数据。</p>
+<h3 id="section-6">函数索引。</h3>
+<p>B*Tree的衍生产物，应用于查询语句条件列上包含函数的情况， 索引中储存了经过函数计算的索引码值。可以在不修改应用程序的基础上能提高查询效率。</p>
+<p>索引创建策略</p>
+<ul>
+<li>导入数据后再创建索引</li>
+<li>不需要为很小的表创建索引</li>
+<li>对于取值范围很小的字段（比如性别字段）应当建立位图索引</li>
+<li>限制表中的索引的数目</li>
+<li>为索引设置合适的PCTFREE值</li>
+<li>存储索引的表空间最好单独设定</li>
+<li>唯一索引和不唯一索引都只是针对B树索引而言. Oracle最多允许包含32个字段的复合索引 由此估计出一个查询如果使用某个索引会需要读入的数据块块数。 需要读入的数据块越多，则 cost 越大，Oracle 也就越有可能不选择使用 index  </li>
+<li>能用唯一索引，一定用唯一索引 能加非空，就加非空约束 一定要统计表的信息，索引的信息，柱状图的信息。 联合索引的顺序不同，影响索引的选择，尽量将值少的放在前面</li>
+</ul>
+<p>只有做到以上几点，数据库才会正确的选择执行计划。</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/02/12/iteye-203/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

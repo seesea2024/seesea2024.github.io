@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Javascript 面向对象编程（一）：封装 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/02/12/iteye-142/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="Javascript 面向对象编程（一）：封装">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="摘自：http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html   Javascript 面向对象编程（一）：封装 作者：阮一峰 Javascript是一种基于对象（object-based）的语言，你遇到的所有东西几乎都是对象。但是，它又不是一种真正的面向对象编程（OOP）语言，因为它的语法中没有class（类）。 那么，如果我们要把&quot;属性&quot;（property）和&quot;方法&quot;（method），封装成一个对象，甚至要从原型对象生成一个实例对象，我们应该怎么做呢？ 1. 生成对象的原始模式 假定我们把猫看成一个对象，它有&quot;名字&quot;和&quot;颜色&quot;两个属性。 　　var Cat = { 　　　　name : '', 　　　　color : '' 　　} 现在，我们需要根据这个原型对象，生成两个实例对象。 　　var cat1 = {};   // 或者 var cat1 = new Object(); 　　　　cat1.name = &quot;大毛&quot;; 　　　　cat1.color = &quot;黄色&quot;; 　　var cat2 = {}; 　　　　cat2.name = &quot;二毛&quot;; 　　　　cat2.color = &quot;黑色&quot;; 好了，这就是最简单的封装了。但是，这样的写法有两个缺点，一是如果多生成几个实例，写起来就非常麻烦；二是实例与原型之间，没有任何办法，可以看出有什么联系。 2. 原始模式的改进 我们可以写一个函数，解决代码重复的问题。 //using Literal Notation　　 function Cat(name,color){ 　　　　return { 　　　　　　name:name, 　　　　　　color:color 　　　　} 　　} 然后生成实例对象，就等于是在调用函数： 　　var cat1 = Cat(&quot;大毛&quot;,&quot;黄色&quot;); 　　var cat2 = Cat(&quot;二毛&quot;,&quot;黑色&quot;); 这种方法的问题依然是，cat1和cat2之间没有内在的联系，不能反映出它们是同一个原型对象的实例。 3. 构造函数模式 为了解决从原型对象生成实例的问题，Javascript提供了一个构造函数（Constructor）模式。 所谓&quot;构造函数&quot;，其实就是一个普通函数，但是内部使用了this 变量 。对构造函数使用new运算符，就能生成实例，并且this变量会绑定在实例对象上。 比如，猫的原型对象现在可以这样写， 　　function Cat(name,color){ 　　　　this.name=name; 　　　　this.color=color; 　　} 我们现在就可以生成实例对象了。 　　var cat1 = new Cat(&quot;大毛&quot;,&quot;黄色&quot;); 　　var cat2 = new Cat(&quot;二毛&quot;,&quot;黑色&quot;); 　　alert(cat1.name); // 大毛 　　alert(cat1.color); // 黄色 这时cat1和cat2会自动含有一个constructor属性，指向它们的构造函数。 　　alert(cat1.constructor == Cat); //true 　　alert(cat2.constructor == Cat); //true Javascript还提供了一个instanceof运算符，验证原型对象与实例对象之间的关系。 　　alert(cat1 instanceof Cat); //true 　　alert(cat2 instanceof Cat); //true 4. 构造函数模式的问题 构造函数方法很好用，但是存在一个浪费内存的问题。 请看，我们现在为Cat对象添加一个不变的属性&quot;type&quot;（种类），再添加一个方法eat（吃老鼠）。那么，原型对象Cat就变成了下面这样： 　　function Cat(name,color){ 　　　　this.name = name; 　　　　this.color = color; 　　　　this.type = &quot;猫科动物&quot;; 　　　　this.eat = function(){alert(&quot;吃老鼠&quot;);}; 　　} 还是采用同样的方法，生成实例： 　　var cat1 = new Cat(&quot;大毛&quot;,&quot;黄色&quot;); 　　var cat2 = new Cat (&quot;二毛&quot;,&quot;黑色&quot;); 　　alert(cat1.type); // 猫科动物 　　cat1.eat(); // 吃老鼠 表面上好像没什么问题，但是实际上这样做，有一个很大的弊端。那就是对于每一个实例对象，type属性和eat()方法都是一模一样的内容，每一次生成一个实例，都必须为重复的内容，多占用一些内存。这样既不环保，也缺乏效率。 　　alert(cat1.eat == cat2.eat); //false 能不能让type属性和eat()方法在内存中只生成一次，然后所有实例都指向那个内存地址呢？回答是可以的。 5. Prototype模式 Javascript规定，每一个构造函数都有一个prototype属性，指向另一个对象。这个对象的所有属性和方法，都会被构造函数的实例继承。 这意味着，我们可以把那些不变的属性和方法，直接定义在prototype对象上。 　　function Cat(name,color){ 　　　　this.name = name; 　　　　this.color = color; 　　} 　　Cat.prototype.type = &quot;猫科动物&quot;; 　　Cat.prototype.eat = function(){alert(&quot;吃老鼠&quot;)}; 然后，生成实例。 　　var cat1 = new Cat(&quot;大毛&quot;,&quot;黄色&quot;); 　　var cat2 = new Cat(&quot;二毛&quot;,&quot;黑色&quot;); 　　alert(cat1.type); // 猫科动物 　　cat1.eat(); // 吃老鼠 这时所有实例的type属性和eat()方法，其实都是一个内存地址，指向prototype对象，因此就提高了运行效率。 　　alert(cat1.eat == cat2.eat); //true 6. Prototype模式的验证方法 6.1 isPrototypeOf() 这个方法用来判断，某个proptotype对象和某个实例之间的关系。 　　alert(Cat.prototype.isPrototypeOf(cat1)); //true 　　alert(Cat.prototype.isPrototypeOf(cat2)); //true 6.2 hasOwnProperty() 每个实例对象都有一个hasOwnProperty()方法，用来判断某一个属性到底是本地属性，还是继承自prototype对象的属性。 　　alert(cat1.hasOwnProperty(&quot;name&quot;)); // true 　　alert(cat1.hasOwnProperty(&quot;type&quot;)); // false 6.3 in运算符 in运算符可以用来判断，某个实例是否含有某个属性，不管是不是本地属性。 　　alert(&quot;name&quot; in cat1); // true 　　alert(&quot;type&quot; in cat1); // true in运算符还可以用来遍历某个对象的所有属性。 　　for(var prop in cat1) { alert(&quot;cat1[&quot;+prop+&quot;]=&quot;+cat1[prop]); } （完）">
+    <meta name="og:description" content="摘自：http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html   Javascript 面向对象编程（一）：封装 作者：阮一峰 Javascript是一种基于对象（object-based）的语言，你遇到的所有东西几乎都是对象。但是，它又不是一种真正的面向对象编程（OOP）语言，因为它的语法中没有class（类）。 那么，如果我们要把&quot;属性&quot;（property）和&quot;方法&quot;（method），封装成一个对象，甚至要从原型对象生成一个实例对象，我们应该怎么做呢？ 1. 生成对象的原始模式 假定我们把猫看成一个对象，它有&quot;名字&quot;和&quot;颜色&quot;两个属性。 　　var Cat = { 　　　　name : '', 　　　　color : '' 　　} 现在，我们需要根据这个原型对象，生成两个实例对象。 　　var cat1 = {};   // 或者 var cat1 = new Object(); 　　　　cat1.name = &quot;大毛&quot;; 　　　　cat1.color = &quot;黄色&quot;; 　　var cat2 = {}; 　　　　cat2.name = &quot;二毛&quot;; 　　　　cat2.color = &quot;黑色&quot;; 好了，这就是最简单的封装了。但是，这样的写法有两个缺点，一是如果多生成几个实例，写起来就非常麻烦；二是实例与原型之间，没有任何办法，可以看出有什么联系。 2. 原始模式的改进 我们可以写一个函数，解决代码重复的问题。 //using Literal Notation　　 function Cat(name,color){ 　　　　return { 　　　　　　name:name, 　　　　　　color:color 　　　　} 　　} 然后生成实例对象，就等于是在调用函数： 　　var cat1 = Cat(&quot;大毛&quot;,&quot;黄色&quot;); 　　var cat2 = Cat(&quot;二毛&quot;,&quot;黑色&quot;); 这种方法的问题依然是，cat1和cat2之间没有内在的联系，不能反映出它们是同一个原型对象的实例。 3. 构造函数模式 为了解决从原型对象生成实例的问题，Javascript提供了一个构造函数（Constructor）模式。 所谓&quot;构造函数&quot;，其实就是一个普通函数，但是内部使用了this 变量 。对构造函数使用new运算符，就能生成实例，并且this变量会绑定在实例对象上。 比如，猫的原型对象现在可以这样写， 　　function Cat(name,color){ 　　　　this.name=name; 　　　　this.color=color; 　　} 我们现在就可以生成实例对象了。 　　var cat1 = new Cat(&quot;大毛&quot;,&quot;黄色&quot;); 　　var cat2 = new Cat(&quot;二毛&quot;,&quot;黑色&quot;); 　　alert(cat1.name); // 大毛 　　alert(cat1.color); // 黄色 这时cat1和cat2会自动含有一个constructor属性，指向它们的构造函数。 　　alert(cat1.constructor == Cat); //true 　　alert(cat2.constructor == Cat); //true Javascript还提供了一个instanceof运算符，验证原型对象与实例对象之间的关系。 　　alert(cat1 instanceof Cat); //true 　　alert(cat2 instanceof Cat); //true 4. 构造函数模式的问题 构造函数方法很好用，但是存在一个浪费内存的问题。 请看，我们现在为Cat对象添加一个不变的属性&quot;type&quot;（种类），再添加一个方法eat（吃老鼠）。那么，原型对象Cat就变成了下面这样： 　　function Cat(name,color){ 　　　　this.name = name; 　　　　this.color = color; 　　　　this.type = &quot;猫科动物&quot;; 　　　　this.eat = function(){alert(&quot;吃老鼠&quot;);}; 　　} 还是采用同样的方法，生成实例： 　　var cat1 = new Cat(&quot;大毛&quot;,&quot;黄色&quot;); 　　var cat2 = new Cat (&quot;二毛&quot;,&quot;黑色&quot;); 　　alert(cat1.type); // 猫科动物 　　cat1.eat(); // 吃老鼠 表面上好像没什么问题，但是实际上这样做，有一个很大的弊端。那就是对于每一个实例对象，type属性和eat()方法都是一模一样的内容，每一次生成一个实例，都必须为重复的内容，多占用一些内存。这样既不环保，也缺乏效率。 　　alert(cat1.eat == cat2.eat); //false 能不能让type属性和eat()方法在内存中只生成一次，然后所有实例都指向那个内存地址呢？回答是可以的。 5. Prototype模式 Javascript规定，每一个构造函数都有一个prototype属性，指向另一个对象。这个对象的所有属性和方法，都会被构造函数的实例继承。 这意味着，我们可以把那些不变的属性和方法，直接定义在prototype对象上。 　　function Cat(name,color){ 　　　　this.name = name; 　　　　this.color = color; 　　} 　　Cat.prototype.type = &quot;猫科动物&quot;; 　　Cat.prototype.eat = function(){alert(&quot;吃老鼠&quot;)}; 然后，生成实例。 　　var cat1 = new Cat(&quot;大毛&quot;,&quot;黄色&quot;); 　　var cat2 = new Cat(&quot;二毛&quot;,&quot;黑色&quot;); 　　alert(cat1.type); // 猫科动物 　　cat1.eat(); // 吃老鼠 这时所有实例的type属性和eat()方法，其实都是一个内存地址，指向prototype对象，因此就提高了运行效率。 　　alert(cat1.eat == cat2.eat); //true 6. Prototype模式的验证方法 6.1 isPrototypeOf() 这个方法用来判断，某个proptotype对象和某个实例之间的关系。 　　alert(Cat.prototype.isPrototypeOf(cat1)); //true 　　alert(Cat.prototype.isPrototypeOf(cat2)); //true 6.2 hasOwnProperty() 每个实例对象都有一个hasOwnProperty()方法，用来判断某一个属性到底是本地属性，还是继承自prototype对象的属性。 　　alert(cat1.hasOwnProperty(&quot;name&quot;)); // true 　　alert(cat1.hasOwnProperty(&quot;type&quot;)); // false 6.3 in运算符 in运算符可以用来判断，某个实例是否含有某个属性，不管是不是本地属性。 　　alert(&quot;name&quot; in cat1); // true 　　alert(&quot;type&quot; in cat1); // true in运算符还可以用来遍历某个对象的所有属性。 　　for(var prop in cat1) { alert(&quot;cat1[&quot;+prop+&quot;]=&quot;+cat1[prop]); } （完）">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/02/12/iteye-142/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-02-12">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Javascript 面向对象">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Javascript 面向对象编程（一）：封装</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/02/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#iteye" title="iteye">iteye</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>摘自：<a href="http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html">http://www.ruanyifeng.com/blog/2010/05/object-oriented_javascript_encapsulation.html</a>   Javascript 面向对象编程（一）：封装 作者：阮一峰 Javascript是一种基于对象（object-based）的语言，你遇到的所有东西几乎都是对象。但是，它又不是一种真正的面向对象编程（OOP）语言，因为它的语法中没有class（类）。 那么，如果我们要把&quot;属性&quot;（property）和&quot;方法&quot;（method），封装成一个对象，甚至要从原型对象生成一个实例对象，我们应该怎么做呢？ 1. 生成对象的原始模式 假定我们把猫看成一个对象，它有&quot;名字&quot;和&quot;颜色&quot;两个属性。 　　var Cat = { 　　　　name : '', 　　　　color : '' 　　} 现在，我们需要根据这个原型对象，生成两个实例对象。 　　var cat1 = {};   // 或者 var cat1 = new Object(); 　　　　cat1.name = &quot;大毛&quot;; 　　　　cat1.color = &quot;黄色&quot;; 　　var cat2 = {}; 　　　　cat2.name = &quot;二毛&quot;; 　　　　cat2.color = &quot;黑色&quot;; 好了，这就是最简单的封装了。但是，这样的写法有两个缺点，一是如果多生成几个实例，写起来就非常麻烦；二是实例与原型之间，没有任何办法，可以看出有什么联系。 2. 原始模式的改进 我们可以写一个函数，解决代码重复的问题。 //using Literal Notation　　 function Cat(name,color){ 　　　　return { 　　　　　　name:name, 　　　　　　color:color 　　　　} 　　} 然后生成实例对象，就等于是在调用函数： 　　var cat1 = Cat(&quot;大毛&quot;,&quot;黄色&quot;); 　　var cat2 = Cat(&quot;二毛&quot;,&quot;黑色&quot;); 这种方法的问题依然是，cat1和cat2之间没有内在的联系，不能反映出它们是同一个原型对象的实例。 3. 构造函数模式 为了解决从原型对象生成实例的问题，Javascript提供了一个构造函数（Constructor）模式。 所谓&quot;构造函数&quot;，其实就是一个普通函数，但是内部使用了this 变量 。对构造函数使用new运算符，就能生成实例，并且this变量会绑定在实例对象上。 比如，猫的原型对象现在可以这样写， 　　function Cat(name,color){ 　　　　this.name=name; 　　　　this.color=color; 　　} 我们现在就可以生成实例对象了。 　　var cat1 = new Cat(&quot;大毛&quot;,&quot;黄色&quot;); 　　var cat2 = new Cat(&quot;二毛&quot;,&quot;黑色&quot;); 　　alert(cat1.name); // 大毛 　　alert(cat1.color); // 黄色 这时cat1和cat2会自动含有一个constructor属性，指向它们的构造函数。 　　alert(cat1.constructor == Cat); //true 　　alert(cat2.constructor == Cat); //true Javascript还提供了一个instanceof运算符，验证原型对象与实例对象之间的关系。 　　alert(cat1 instanceof Cat); //true 　　alert(cat2 instanceof Cat); //true 4. 构造函数模式的问题 构造函数方法很好用，但是存在一个浪费内存的问题。 请看，我们现在为Cat对象添加一个不变的属性&quot;type&quot;（种类），再添加一个方法eat（吃老鼠）。那么，原型对象Cat就变成了下面这样： 　　function Cat(name,color){ 　　　　this.name = name; 　　　　this.color = color; 　　　　this.type = &quot;猫科动物&quot;; 　　　　this.eat = function(){alert(&quot;吃老鼠&quot;);}; 　　} 还是采用同样的方法，生成实例： 　　var cat1 = new Cat(&quot;大毛&quot;,&quot;黄色&quot;); 　　var cat2 = new Cat (&quot;二毛&quot;,&quot;黑色&quot;); 　　alert(cat1.type); // 猫科动物 　　cat1.eat(); // 吃老鼠 表面上好像没什么问题，但是实际上这样做，有一个很大的弊端。那就是对于每一个实例对象，type属性和eat()方法都是一模一样的内容，每一次生成一个实例，都必须为重复的内容，多占用一些内存。这样既不环保，也缺乏效率。 　　alert(cat1.eat == cat2.eat); //false 能不能让type属性和eat()方法在内存中只生成一次，然后所有实例都指向那个内存地址呢？回答是可以的。 5. Prototype模式 Javascript规定，每一个构造函数都有一个prototype属性，指向另一个对象。这个对象的所有属性和方法，都会被构造函数的实例继承。 这意味着，我们可以把那些不变的属性和方法，直接定义在prototype对象上。 　　function Cat(name,color){ 　　　　this.name = name; 　　　　this.color = color; 　　} 　　Cat.prototype.type = &quot;猫科动物&quot;; 　　Cat.prototype.eat = function(){alert(&quot;吃老鼠&quot;)}; 然后，生成实例。 　　var cat1 = new Cat(&quot;大毛&quot;,&quot;黄色&quot;); 　　var cat2 = new Cat(&quot;二毛&quot;,&quot;黑色&quot;); 　　alert(cat1.type); // 猫科动物 　　cat1.eat(); // 吃老鼠 这时所有实例的type属性和eat()方法，其实都是一个内存地址，指向prototype对象，因此就提高了运行效率。 　　alert(cat1.eat == cat2.eat); //true 6. Prototype模式的验证方法 6.1 isPrototypeOf() 这个方法用来判断，某个proptotype对象和某个实例之间的关系。 　　alert(Cat.prototype.isPrototypeOf(cat1)); //true 　　alert(Cat.prototype.isPrototypeOf(cat2)); //true 6.2 hasOwnProperty() 每个实例对象都有一个hasOwnProperty()方法，用来判断某一个属性到底是本地属性，还是继承自prototype对象的属性。 　　alert(cat1.hasOwnProperty(&quot;name&quot;)); // true 　　alert(cat1.hasOwnProperty(&quot;type&quot;)); // false 6.3 in运算符 in运算符可以用来判断，某个实例是否含有某个属性，不管是不是本地属性。 　　alert(&quot;name&quot; in cat1); // true 　　alert(&quot;type&quot; in cat1); // true in运算符还可以用来遍历某个对象的所有属性。 　　for(var prop in cat1) { alert(&quot;cat1[&quot;+prop+&quot;]=&quot;+cat1[prop]); } （完）</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/02/12/iteye-142/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

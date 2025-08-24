@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>自定义ClassLoader热加载jar文件中的类 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2019/09/22/custom-ClassLoader/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="自定义ClassLoader热加载jar文件中的类">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="本文主要分析和解决Spring Boot中自定义URLClassLoader热加载jar时遇到的坑。模拟场景是动态修改一个class文件后，访问web服务endpoint后立即反应出来。每次修改后的class文件打包为一个jar文件并通过我们自定义的ClassLoader加载。">
+    <meta name="og:description" content="本文主要分析和解决Spring Boot中自定义URLClassLoader热加载jar时遇到的坑。模拟场景是动态修改一个class文件后，访问web服务endpoint后立即反应出来。每次修改后的class文件打包为一个jar文件并通过我们自定义的ClassLoader加载。">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2019/09/22/custom-ClassLoader/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2019-09-22">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="自定义ClassLoader热">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">自定义ClassLoader热加载jar文件中的类</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2019/09/22
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#JDK" title="JDK">JDK</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths">
+    <article class="article-content markdown-body">
+    <p>本文主要分析和解决Spring Boot中自定义URLClassLoader热加载jar时遇到的坑。
+模拟场景是动态修改一个class文件后，访问web服务endpoint后立即反应出来。每次修改后的class文件打包为一个jar文件并通过我们自定义的ClassLoader加载。</p>
+<h2 id="urlclassloaderjar">自定义URLClassLoader加载jar</h2>
+<ul>
+<li>自定义ClassLoader</li>
+</ul>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">com.stone.jdk.demohotswap.classloader</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.net.JarURLConnection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.net.URL</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.net.URLClassLoader</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.net.URLConnection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+
+<span class="cm">/**
+ * 参考：https://blog.csdn.net/jianggujin/article/details/80536019
+ */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyClassLoader</span> <span class="kd">extends</span> <span class="nc">URLClassLoader</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="n">canCloseJar</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">JarURLConnection</span><span class="o">&gt;</span> <span class="n">cachedJarFiles</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+
+    <span class="kd">static</span> <span class="o">{</span>
+        <span class="c1">// 1.7之后可以直接调用close方法关闭打开的jar，</span>
+        <span class="c1">// 需要判断当前运行的环境是否支持close方法，</span>
+        <span class="c1">// 如果不支持，需要缓存，避免卸载模块后无法删除jar</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="nc">URLClassLoader</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getMethod</span><span class="o">(</span><span class="s">"close"</span><span class="o">);</span>
+            <span class="n">canCloseJar</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">canCloseJar</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">MyClassLoader</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="k">new</span> <span class="no">URL</span><span class="o">[</span><span class="mi">0</span><span class="o">],</span> <span class="n">findParentClassLoader</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="nc">ClassLoader</span> <span class="nf">findParentClassLoader</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">ClassLoader</span> <span class="n">parent</span> <span class="o">=</span> <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getContextClassLoader</span><span class="o">();</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"context loader:"</span> <span class="o">+</span> <span class="n">parent</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">parent</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="na">getParent</span><span class="o">();</span> <span class="c1">// use appClassLoader rather than LaunchedClassLoader</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">parent</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="nc">ClassLoader</span><span class="o">.</span><span class="na">getSystemClassLoader</span><span class="o">();</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="n">parent</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addURL</span><span class="o">(</span><span class="no">URL</span> <span class="n">url</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">canCloseJar</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="c1">// 打开并缓存文件url连接</span>
+                <span class="nc">URLConnection</span> <span class="n">uc</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="na">openConnection</span><span class="o">();</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">uc</span> <span class="k">instanceof</span> <span class="nc">JarURLConnection</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">uc</span><span class="o">.</span><span class="na">setUseCaches</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+                    <span class="o">((</span><span class="nc">JarURLConnection</span><span class="o">)</span> <span class="n">uc</span><span class="o">).</span><span class="na">getManifest</span><span class="o">();</span>
+                    <span class="n">cachedJarFiles</span><span class="o">.</span><span class="na">add</span><span class="o">((</span><span class="nc">JarURLConnection</span><span class="o">)</span> <span class="n">uc</span><span class="o">);</span>
+                <span class="o">}</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">// ignore</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">addURL</span><span class="o">(</span><span class="n">url</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">()</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">canCloseJar</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="kd">super</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">IOException</span> <span class="n">ioe</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">// ignore</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">for</span> <span class="o">(</span><span class="nc">JarURLConnection</span> <span class="n">conn</span> <span class="o">:</span> <span class="n">cachedJarFiles</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">conn</span><span class="o">.</span><span class="na">getJarFile</span><span class="o">().</span><span class="na">close</span><span class="o">();</span>
+
+            <span class="o">}</span>
+            <span class="n">cachedJarFiles</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<ul>
+<li>web服务</li>
+</ul>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">com.stone.jdk.demohotswap</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">com.stone.jdk.demohotswap.classloader.MyClassLoader</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.boot.SpringApplication</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.SpringBootApplication</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.boot.builder.SpringApplicationBuilder</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.boot.web.servlet.support.SpringBootServletInitializer</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RestController</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.lang.reflect.Method</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.net.JarURLConnection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.net.URL</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.text.SimpleDateFormat</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Date</span><span class="o">;</span>
+
+<span class="nd">@SpringBootApplication</span>
+<span class="nd">@RestController</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DemoHotswapApplication</span> <span class="kd">extends</span> <span class="nc">SpringBootServletInitializer</span> <span class="o">{</span>
+<span class="c1">//public class DemoHotswapApplication {</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">PROTOCOL_HANDLER</span> <span class="o">=</span> <span class="s">"java.protocol.handler.pkgs"</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="nc">DemoHotswapApplication</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="nc">SpringApplicationBuilder</span> <span class="nf">configure</span><span class="o">(</span><span class="nc">SpringApplicationBuilder</span> <span class="n">application</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">application</span><span class="o">.</span><span class="na">sources</span><span class="o">(</span><span class="nc">DemoHotswapApplication</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@RequestMapping</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">index</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">"Hello Mr Swap!"</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@RequestMapping</span><span class="o">(</span><span class="s">"/swap"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">swap</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">MyClassLoader</span> <span class="n">cl</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">MyClassLoader</span><span class="o">();</span>
+
+        <span class="nc">String</span> <span class="n">jarFile</span> <span class="o">=</span> <span class="nc">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"jar:file:%s/%s!/"</span><span class="o">,</span> <span class="s">"/tmp"</span><span class="o">,</span> <span class="s">"test.jar"</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">// reproduce BUG un-comment below line</span>
+            <span class="no">URL</span> <span class="n">jarUrl</span> <span class="o">=</span> <span class="k">new</span> <span class="no">URL</span><span class="o">(</span><span class="n">jarFile</span><span class="o">);</span>
+            <span class="c1">// FIX bug un-comment below line</span>
+            <span class="c1">// URL jarUrl = new URL(null, jarFile, new sun.net.www.protocol.jar.Handler());</span>
+            <span class="n">cl</span><span class="o">.</span><span class="na">addURL</span><span class="o">(</span><span class="n">jarUrl</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+
+        <span class="no">URL</span><span class="o">[]</span> <span class="n">urls</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="na">getURLs</span><span class="o">();</span>
+        <span class="k">if</span><span class="o">(</span><span class="n">urls</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">urls</span><span class="o">.</span><span class="na">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="c1">// Create a jar URL connection object</span>
+                <span class="nc">JarURLConnection</span> <span class="n">jarURLConnection</span> <span class="o">=</span> <span class="o">(</span><span class="nc">JarURLConnection</span><span class="o">)</span> <span class="n">urls</span><span class="o">[</span><span class="mi">0</span><span class="o">].</span><span class="na">openConnection</span><span class="o">();</span>
+                <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"jarURLConnection:"</span> <span class="o">+</span> <span class="n">jarURLConnection</span><span class="o">);</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">ex</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+
+        <span class="nc">String</span> <span class="n">handlers</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="no">PROTOCOL_HANDLER</span><span class="o">,</span> <span class="s">""</span><span class="o">);</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"handlers:"</span> <span class="o">+</span> <span class="n">handlers</span><span class="o">);</span>
+
+        <span class="nc">String</span> <span class="n">output</span> <span class="o">=</span> <span class="s">"NA"</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="nc">Class</span><span class="o">&lt;?&gt;</span> <span class="n">swapClass</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="na">loadClass</span><span class="o">(</span><span class="s">"com.stone.jdk.demohotswap.swapClass.SwapMe"</span><span class="o">);</span>
+            <span class="nc">Object</span> <span class="n">plugin</span> <span class="o">=</span> <span class="n">swapClass</span><span class="o">.</span><span class="na">newInstance</span><span class="o">();</span>
+            <span class="nc">Method</span> <span class="n">method</span> <span class="o">=</span> <span class="n">swapClass</span><span class="o">.</span><span class="na">getMethod</span><span class="o">(</span><span class="s">"hello"</span><span class="o">);</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="o">(</span><span class="nc">String</span><span class="o">)</span><span class="n">method</span><span class="o">.</span><span class="na">invoke</span><span class="o">(</span><span class="n">plugin</span><span class="o">);</span>
+            <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"output:"</span> <span class="o">+</span> <span class="n">output</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">ex</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">cl</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">ex</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="nc">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"%s - %s"</span><span class="o">,</span> <span class="n">output</span><span class="o">,</span>
+                <span class="k">new</span> <span class="nf">SimpleDateFormat</span><span class="o">(</span><span class="s">"yyyy-MM-dd HH:mm:ss.sss"</span><span class="o">).</span><span class="na">format</span><span class="o">(</span><span class="k">new</span> <span class="nc">Date</span><span class="o">()));</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<ul>
+<li>热加载的类，注意这个类不要打包到测试的war包中。应该通过 <code>jar cvf test.jar com/stone/jdk/demohotswap/swapClass/SwapMe.class </code> 单独打包</li>
+</ul>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">com.stone.jdk.demohotswap.swapClass</span><span class="o">;</span>
+
+<span class="cm">/**
+ * @Description:
+ * @author: donghua
+ * @date: 2019-09-22
+ */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SwapMe</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">hello</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">"Swap Before!"</span><span class="o">;</span>
+<span class="c1">//        return "Swap After!";</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<h2 id="section">问题描述</h2>
+<p>上面代码build成spring boot war包部署到独立的jetty服务器没有问题，（包括jetty runner方式、start.jar等）。但是用`java -jar demo.jar"方式时出现java.lang.ClassFormatError。</p>
+<pre><code>org.springframework.web.util.NestedServletException: Handler dispatch failed; nested exception is java.lang.ClassFormatError: Truncated class file
+        at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1054) ~[spring-webmvc-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:942) ~[spring-webmvc-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1005) ~[spring-webmvc-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:897) ~[spring-webmvc-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:645) ~[javax.servlet-api-4.0.1.jar!/:4.0.1]
+        at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:882) ~[spring-webmvc-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:750) ~[javax.servlet-api-4.0.1.jar!/:4.0.1]
+        at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:876) ~[jetty-servlet-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1623) ~[jetty-servlet-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter.doFilter(WebSocketUpgradeFilter.java:214) ~[websocket-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1610) ~[jetty-servlet-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:99) ~[spring-web-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:118) ~[spring-web-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1610) ~[jetty-servlet-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:92) ~[spring-web-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:118) ~[spring-web-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1610) ~[jetty-servlet-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.springframework.web.filter.HiddenHttpMethodFilter.doFilterInternal(HiddenHttpMethodFilter.java:93) ~[spring-web-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:118) ~[spring-web-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1610) ~[jetty-servlet-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:200) ~[spring-web-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:118) ~[spring-web-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1610) ~[jetty-servlet-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:540) ~[jetty-servlet-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:146) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548) ~[jetty-security-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:257) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1711) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:255) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1347) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:203) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:480) ~[jetty-servlet-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1678) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:201) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1249) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:144) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.Server.handle(Server.java:505) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:370) ~[jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:267) [jetty-server-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:305) [jetty-io-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103) [jetty-io-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117) [jetty-io-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:781) [jetty-util-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:917) [jetty-util-9.4.19.v20190610.jar!/:9.4.19.v20190610]
+        at java.lang.Thread.run(Thread.java:748) [na:1.8.0_171]
+Caused by: java.lang.ClassFormatError: Truncated class file
+        at java.lang.ClassLoader.defineClass1(Native Method) ~[na:1.8.0_171]
+        at java.lang.ClassLoader.defineClass(ClassLoader.java:763) ~[na:1.8.0_171]
+        at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:142) ~[na:1.8.0_171]
+ at java.net.URLClassLoader.defineClass(URLClassLoader.java:467) ~[na:1.8.0_171]
+        at java.net.URLClassLoader.access$100(URLClassLoader.java:73) ~[na:1.8.0_171]
+        at java.net.URLClassLoader$1.run(URLClassLoader.java:368) ~[na:1.8.0_171]
+        at java.net.URLClassLoader$1.run(URLClassLoader.java:362) ~[na:1.8.0_171]
+        at java.security.AccessController.doPrivileged(Native Method) ~[na:1.8.0_171]
+        at java.net.URLClassLoader.findClass(URLClassLoader.java:361) ~[na:1.8.0_171]
+        at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[na:1.8.0_171]
+        at java.lang.ClassLoader.loadClass(ClassLoader.java:357) ~[na:1.8.0_171]
+        at com.stone.jdk.demohotswap.DemoHotswapApplication.swap(DemoHotswapApplication.java:64) ~[classes!/:0.0.1-SNAPSHOT]
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:1.8.0_171]
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[na:1.8.0_171]
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:1.8.0_171]
+        at java.lang.reflect.Method.invoke(Method.java:498) ~[na:1.8.0_171]
+        at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190) ~[spring-web-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138) ~[spring-web-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:104) ~[spring-webmvc-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:892) ~[spring-webmvc-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:797) ~[spring-webmvc-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1039) ~[spring-webmvc-5.1.9.RELEASE.jar!/:5.1.9.RELEASE]
+        ... 46 common frames omitted
+</code></pre>
+<p>重现步骤如下</p>
+<ol>
+<li>git clone <a href="https://github.com/shidongwa/demo-hotswap.git">https://github.com/shidongwa/demo-hotswap.git</a>
+</li>
+<li>cd demo-hotswap</li>
+<li>mvn clean package</li>
+<li>copy demo.war to you workspace</li>
+<li>build and move test.jar to /tmp
+<code>jar cvf test.jar com/stone/jdk/demohotswap/swapClass/SwapMe.class</code>
+<code>cp test.jar /tmp/</code>
+</li>
+<li>run demo.war in this way <code>java -jar demo.war</code>
+</li>
+<li>access endpoint <a href="http://localhost:8080/swap">http://localhost:8080/swap</a>
+</li>
+<li>update SwapMe.java, package and replace test.jar</li>
+<li>access endpoint <a href="http://localhost:8080/swap">http://localhost:8080/swap</a> again</li>
+<li>上面的异常出现</li>
+</ol>
+<p><em>注意：</em> 如果以这种方式启动 <code>java -cp jetty-runner-9.4.14.v20181114.jar org.eclipse.jetty.runner.Runner demo.war</code> 不会有问题。</p>
+<h2 id="section-1">问题分析</h2>
+<p>比较下面两种jetty启动方式</p>
+<ul>
+<li>
+<code>java -jar demo.war</code> 是以Spring boot WarLauncher方式加载fat jar</li>
+<li>
+<code>java -cp jetty-runner-9.4.14.v20181114.jar org.eclipse.jetty.runner.Runner demo.war</code> 方式启动看当前线程ClassLoader是WebAppClassLoader而不是Spring boot LaunchedClassLoader</li>
+<li>对应fat jar加载时打印jarFile url connection 是
+<code>jarURLConnection:org.springframework.boot.loader.jar.JarURLConnection:jar:file:/tmp/test.jar!/</code>
+</li>
+<li>对应jetty runner加载时打印jarFile url connetion 是<code>jarURLConnection:sun.net.www.protocol.jar.JarURLConnection:jar:file:/tmp/test.jar!/</code>
+</li>
+<li>可以看出两种启动方式对应URLClassLoader加载jarFile的方式不同</li>
+<li>从Spring boot社区看考虑性能问题，Spring boot loader不支持动态更新加载的jar文件。参考：<a href="https://github.com/spring-projects/spring-boot/issues/15964">https://github.com/spring-projects/spring-boot/issues/15964</a>
+</li>
+</ul>
+<h2 id="section-2">问题解决</h2>
+<p>我们自定义URLClassLoader和Spring Boot fat jar是隔离和分开打包的。 通过在URLClassLoader加载jar包时指定sun.net.www.protocol.jar.Handler可以解决Spring
+boot org.springframework.boot.loader.jar.JarURLConnection不能热更的问题。</p>
+<h2 id="section-3">参考</h2>
+<ul>
+<li><a href="https://github.com/shidongwa/demo-hotswap">https://github.com/shidongwa/demo-hotswap</a></li>
+</ul>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2019/09/22/custom-ClassLoader/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)">TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

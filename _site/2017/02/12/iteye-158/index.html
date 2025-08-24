@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>方法中的异常声明属于方法签名吗？ &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/02/12/iteye-158/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="方法中的异常声明属于方法签名吗？">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="异常是方法执行完后才抛出的，跟返回结果相似，从这个角度来说不应该是方法签名的一部分。我们知道，如果根据不同的返回类型来区别签名从而达到重载的目的是不允许的，因为方法在没有返回前系统是不知道该选择哪个方法来执行的。Java中也不允许仅仅异常声明不一样的方法进行重载。  异常在接口实现，方法继承中只能变的越来越少（变窄）。也即父类异常声明必须包括(或者说是子类异常的父类）子类异常声明。这个可以这么理解，因为我们都是面向接口或者超类编程，客户端代码一定捕获的是接口或者超类中声明的异常。这样不管具体实现类中抛出什么样的异常，对客户端代码中的try，catch结构不会有任何影响。相反如果具体类中抛出一个接口中没有的异常，客户端的代码（catch语句）就要必须做出改变，这也就破坏了我们面向接口编程的初衷了。而Core Java中异常的处理正是按照继承或接口实现时异常变窄来实现的。    针对实现接口时方法声明中异常变窄的性质。RMI和EJB中有一个设计的模式可以参考。 我们知道，RMI中需要声明一个远程接口，每个暴露出来的方法需要抛出java.rmi.RemoteException,远程接口需要继承java.rmi.Remote接口。对于客户端调用来说对于这么RemoteException基本上是无能为力的，相反写起代码起来比较麻烦。一种思路是对应远程接口声明一个业务接口，该业务接口中不包括Remote,RemoteException声明。服务端RMI实现时一个改变是需要同时实现远程接口和业务接口。对于客户端来说跟以前一样，只是根据Naming找到对象以后转化为业务接口操作即可。当然如果需要处理RemoteException的话那么把取出来的对象转化为远程接口接口即可。    ">
+    <meta name="og:description" content="异常是方法执行完后才抛出的，跟返回结果相似，从这个角度来说不应该是方法签名的一部分。我们知道，如果根据不同的返回类型来区别签名从而达到重载的目的是不允许的，因为方法在没有返回前系统是不知道该选择哪个方法来执行的。Java中也不允许仅仅异常声明不一样的方法进行重载。  异常在接口实现，方法继承中只能变的越来越少（变窄）。也即父类异常声明必须包括(或者说是子类异常的父类）子类异常声明。这个可以这么理解，因为我们都是面向接口或者超类编程，客户端代码一定捕获的是接口或者超类中声明的异常。这样不管具体实现类中抛出什么样的异常，对客户端代码中的try，catch结构不会有任何影响。相反如果具体类中抛出一个接口中没有的异常，客户端的代码（catch语句）就要必须做出改变，这也就破坏了我们面向接口编程的初衷了。而Core Java中异常的处理正是按照继承或接口实现时异常变窄来实现的。    针对实现接口时方法声明中异常变窄的性质。RMI和EJB中有一个设计的模式可以参考。 我们知道，RMI中需要声明一个远程接口，每个暴露出来的方法需要抛出java.rmi.RemoteException,远程接口需要继承java.rmi.Remote接口。对于客户端调用来说对于这么RemoteException基本上是无能为力的，相反写起代码起来比较麻烦。一种思路是对应远程接口声明一个业务接口，该业务接口中不包括Remote,RemoteException声明。服务端RMI实现时一个改变是需要同时实现远程接口和业务接口。对于客户端来说跟以前一样，只是根据Naming找到对象以后转化为业务接口操作即可。当然如果需要处理RemoteException的话那么把取出来的对象转化为远程接口接口即可。    ">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/02/12/iteye-158/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-02-12">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="方法中的异常声明属于方法签名吗">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">方法中的异常声明属于方法签名吗？</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/02/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#iteye" title="iteye">iteye</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <ol>
+<li>异常是方法执行完后才抛出的，跟返回结果相似，从这个角度来说不应该是方法签名的一部分。我们知道，如果根据不同的返回类型来区别签名从而达到重载的目的是不允许的，因为方法在没有返回前系统是不知道该选择哪个方法来执行的。Java中也不允许仅仅异常声明不一样的方法进行重载。  </li>
+<li>异常在接口实现，方法继承中只能变的越来越少（变窄）。也即父类异常声明必须包括(或者说是子类异常的父类）子类异常声明。这个可以这么理解，因为我们都是面向接口或者超类编程，客户端代码一定捕获的是接口或者超类中声明的异常。这样不管具体实现类中抛出什么样的异常，对客户端代码中的try，catch结构不会有任何影响。相反如果具体类中抛出一个接口中没有的异常，客户端的代码（catch语句）就要必须做出改变，这也就破坏了我们面向接口编程的初衷了。而Core Java中异常的处理正是按照继承或接口实现时异常变窄来实现的。    </li>
+<li>针对实现接口时方法声明中异常变窄的性质。RMI和EJB中有一个设计的模式可以参考。 我们知道，RMI中需要声明一个远程接口，每个暴露出来的方法需要抛出java.rmi.RemoteException,远程接口需要继承java.rmi.Remote接口。对于客户端调用来说对于这么RemoteException基本上是无能为力的，相反写起代码起来比较麻烦。</li>
+</ol>
+<p>一种思路是对应远程接口声明一个业务接口，该业务接口中不包括Remote,RemoteException声明。服务端RMI实现时一个改变是需要同时实现远程接口和业务接口。对于客户端来说跟以前一样，只是根据Naming找到对象以后转化为业务接口操作即可。当然如果需要处理RemoteException的话那么把取出来的对象转化为远程接口接口即可。    </p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/02/12/iteye-158/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

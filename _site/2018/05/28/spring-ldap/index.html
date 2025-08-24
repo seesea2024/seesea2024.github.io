@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Spring LDAP 认证 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2018/05/28/spring-ldap/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="Spring LDAP 认证">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="Spring提供了专门的LDAP集成库和解决方案。参考：https://spring.io/guides/gs/authenticating-ldap/">
+    <meta name="og:description" content="Spring提供了专门的LDAP集成库和解决方案。参考：https://spring.io/guides/gs/authenticating-ldap/">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2018/05/28/spring-ldap/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2018-05-28">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Spring LDAP 认证">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Spring LDAP 认证</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2018/05/28
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#Spring%20LDAP" title="Spring LDAP">Spring LDAP</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths">
+    <article class="article-content markdown-body">
+    <p>Spring提供了专门的LDAP集成库和解决方案。参考：<a href="https://spring.io/guides/gs/authenticating-ldap/">https://spring.io/guides/gs/authenticating-ldap/</a></p>
+<p>参考用户文档中容易产生一个误区。</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebSecurityConfig</span> <span class="kd">extends</span> <span class="nc">WebSecurityConfigurerAdapter</span> <span class="o">{</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="nc">HttpSecurity</span> <span class="n">http</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+		<span class="n">http</span>
+			<span class="o">.</span><span class="na">authorizeRequests</span><span class="o">()</span>
+				<span class="o">.</span><span class="na">anyRequest</span><span class="o">().</span><span class="na">fullyAuthenticated</span><span class="o">()</span>
+				<span class="o">.</span><span class="na">and</span><span class="o">()</span>
+			<span class="o">.</span><span class="na">formLogin</span><span class="o">();</span>
+	<span class="o">}</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="nc">AuthenticationManagerBuilder</span> <span class="n">auth</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+		<span class="n">auth</span>
+			<span class="o">.</span><span class="na">ldapAuthentication</span><span class="o">()</span>
+				<span class="o">.</span><span class="na">userDnPatterns</span><span class="o">(</span><span class="s">"uid={0},ou=people"</span><span class="o">)</span>
+				<span class="o">.</span><span class="na">groupSearchBase</span><span class="o">(</span><span class="s">"ou=groups"</span><span class="o">)</span>
+				<span class="o">.</span><span class="na">contextSource</span><span class="o">()</span>
+					<span class="o">.</span><span class="na">url</span><span class="o">(</span><span class="s">"ldap://localhost:8389/dc=springframework,dc=org"</span><span class="o">)</span>
+					<span class="o">.</span><span class="na">and</span><span class="o">()</span>
+				<span class="o">.</span><span class="na">passwordCompare</span><span class="o">()</span>
+					<span class="o">.</span><span class="na">passwordEncoder</span><span class="o">(</span><span class="k">new</span> <span class="nc">LdapShaPasswordEncoder</span><span class="o">())</span>
+					<span class="o">.</span><span class="na">passwordAttribute</span><span class="o">(</span><span class="s">"userPassword"</span><span class="o">);</span>
+	<span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+<p>上面参考代码中下面这部分是不合适的。首先LdapShaPasswordEncoder是deperacated类不推荐使用；其次这种LDAP认证方式会把LDAP当作一个存用户信息的数据库，而不是认证服务器。因为他是先根据用户id从LDAP中查询用户对象，获取后再取出用户密码跟前端传过来的进行比对（当然密码存储不是明文，会做单向加密）。</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>					<span class="o">.</span><span class="na">and</span><span class="o">()</span>
+				<span class="o">.</span><span class="na">passwordCompare</span><span class="o">()</span>
+					<span class="o">.</span><span class="na">passwordEncoder</span><span class="o">(</span><span class="k">new</span> <span class="nc">LdapShaPasswordEncoder</span><span class="o">())</span>
+					<span class="o">.</span><span class="na">passwordAttribute</span><span class="o">(</span><span class="s">"userPassword"</span><span class="o">);</span>
+</code></pre></div></div>
+<p>理想中的情况是我们把前端输入的用户名和密码透传给LDAP，由LDAP完成认证服务，应用服务器并不用关心LDAP密码加密方式等。</p>
+<p>其实Spring LDAP本身就支持这种认证方式。这里就要区别<code>BindAuthenticator</code> 和 <code>PasswordComparisonAuthenticator</code>。上面的就是PasswordComparisonAuthenticator方式。那么怎么让WebSecurityConfigurerAdapter支持BindAuthenticator呢？</p>
+<p>很简单，去掉上面passwordEncoder就会应用BindAuthenticator。而且上面的配置中并不需要提及userPassword。因为BindAuthenticator会中上下文中的authentication对象中获取。Authentication会从basic auth popup form中获取用户名，密码信息。</p>
+<p>相关逻辑参考spring 源码如下：</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="nc">AuthenticationManagerBuilder</span> <span class="n">auth</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="n">auth</span>
+                <span class="o">.</span><span class="na">ldapAuthentication</span><span class="o">();</span> <span class="c1">// 入口处</span>
+	<span class="o">}</span>
+
+		<span class="cm">/**
+	 * Creates the {@link LdapAuthenticator} to use
+	 *
+	 * @param contextSource the {@link BaseLdapPathContextSource} to use
+	 * @return the {@link LdapAuthenticator} to use
+	 */</span>
+	<span class="kd">private</span> <span class="nc">LdapAuthenticator</span> <span class="nf">createLdapAuthenticator</span><span class="o">(</span>
+			<span class="nc">BaseLdapPathContextSource</span> <span class="n">contextSource</span><span class="o">)</span> <span class="o">{</span>
+		<span class="nc">AbstractLdapAuthenticator</span> <span class="n">ldapAuthenticator</span> <span class="o">=</span> <span class="n">passwordEncoder</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">?</span> <span class="n">createBindAuthenticator</span><span class="o">(</span><span class="n">contextSource</span><span class="o">)</span>
+				<span class="o">:</span> <span class="n">createPasswordCompareAuthenticator</span><span class="o">(</span><span class="n">contextSource</span><span class="o">);</span> <span class="err">·</span>
+		<span class="nc">LdapUserSearch</span> <span class="n">userSearch</span> <span class="o">=</span> <span class="n">createUserSearch</span><span class="o">();</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">userSearch</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">ldapAuthenticator</span><span class="o">.</span><span class="na">setUserSearch</span><span class="o">(</span><span class="n">userSearch</span><span class="o">);</span>
+		<span class="o">}</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">userDnPatterns</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">userDnPatterns</span><span class="o">.</span><span class="na">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">ldapAuthenticator</span><span class="o">.</span><span class="na">setUserDnPatterns</span><span class="o">(</span><span class="n">userDnPatterns</span><span class="o">);</span>
+		<span class="o">}</span>
+		<span class="k">return</span> <span class="nf">postProcess</span><span class="o">(</span><span class="n">ldapAuthenticator</span><span class="o">);</span>
+	<span class="o">}</span>
+
+</code></pre></div></div>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2018/05/28/spring-ldap/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)">TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Vim &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/wiki/vim/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="Vim">
+      
+    <meta name="keywords" content="Vim">
+    <meta name="og:keywords" content="Vim">
+      
+    <meta name="description" content="移动">
+    <meta name="og:description" content="移动">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/wiki/vim/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2025-08-24">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Vim">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Vim</h1>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h3 id="section">移动</h3>
+<p><strong>以字（符）为单位</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">上</td>
+<td align="left"><code>k</code></td>
+</tr>
+<tr>
+<td align="left">下</td>
+<td align="left"><code>j</code></td>
+</tr>
+<tr>
+<td align="left">左</td>
+<td align="left"><code>h</code></td>
+</tr>
+<tr>
+<td align="left">右</td>
+<td align="left"><code>l</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>以单词为单位</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">前一个单词尾</td>
+<td align="left"><code>ge</code></td>
+</tr>
+<tr>
+<td align="left">后一个单词首</td>
+<td align="left"><code>w</code></td>
+</tr>
+<tr>
+<td align="left">本单词首（已在本词首则跳到前一单词首）</td>
+<td align="left"><code>b</code></td>
+</tr>
+<tr>
+<td align="left">本单词尾（已在本词尾则跳到后一单词尾）</td>
+<td align="left"><code>e</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>以屏幕为单位</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">向下翻页</td>
+<td align="left"><code>CTRL-f</code></td>
+</tr>
+<tr>
+<td align="left">向上翻页</td>
+<td align="left"><code>CTRL-b</code></td>
+</tr>
+<tr>
+<td align="left">向下翻半页</td>
+<td align="left"><code>CTRL-d</code></td>
+</tr>
+<tr>
+<td align="left">向上翻半页</td>
+<td align="left"><code>CTRL-u</code></td>
+</tr>
+<tr>
+<td align="left">向上一行</td>
+<td align="left"><code>CTRL-y</code></td>
+</tr>
+<tr>
+<td align="left">向下一行</td>
+<td align="left"><code>CTRL-e</code></td>
+</tr>
+<tr>
+<td align="left">光标移到屏幕上方</td>
+<td align="left"><code>H</code></td>
+</tr>
+<tr>
+<td align="left">光标移到屏幕中间</td>
+<td align="left"><code>M</code></td>
+</tr>
+<tr>
+<td align="left">光标移到屏幕下方</td>
+<td align="left"><code>L</code></td>
+</tr>
+<tr>
+<td align="left">光标所在位置移到屏幕上方</td>
+<td align="left"><code>zt</code></td>
+</tr>
+<tr>
+<td align="left">光标所在位置移到屏幕中间</td>
+<td align="left"><code>zz</code></td>
+</tr>
+<tr>
+<td align="left">光标所在位置移到屏幕下方</td>
+<td align="left"><code>zb</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>行号</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">跳到第 num 行</td>
+<td align="left"><code>:num</code> 或 <code>numG</code> 或 <code>numgg</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>文件</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">跳到文件头</td>
+<td align="left"><code>gg</code></td>
+</tr>
+<tr>
+<td align="left">跳到文件尾</td>
+<td align="left"><code>G</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="section-1">编辑</h3>
+<h4 id="section-2">复制</h4>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">复制光标所在单词</td>
+<td align="left"><code>yiw</code></td>
+</tr>
+<tr>
+<td align="left">复制光标所在行</td>
+<td align="left"><code>yy</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="section-3">粘贴</h4>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">在光标之后粘贴</td>
+<td align="left"><code>p</code></td>
+</tr>
+<tr>
+<td align="left">在光标之前粘贴</td>
+<td align="left"><code>P</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="section-4">剪切</h4>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">剪切选中区域</td>
+<td align="left"><code>d</code></td>
+</tr>
+<tr>
+<td align="left">剪切光标所在行</td>
+<td align="left"><code>dd</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="section-5">替换</h4>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">将全文中的 str1 替换为 str1</td>
+<td align="left"><code>:%s/str1/str2/g</code></td>
+</tr>
+<tr>
+<td align="left">将 1 到 5 行中的 str1 替换为 str2</td>
+<td align="left"><code>:1,5/str1/str2/g</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="section-6">大小写</h4>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">将选中内容大小写互换</td>
+<td align="left"><code>~</code></td>
+</tr>
+<tr>
+<td align="left">将选中内容全转为小写</td>
+<td align="left"><code>gu</code></td>
+</tr>
+<tr>
+<td align="left">将选中内容全转为大写</td>
+<td align="left"><code>gU</code></td>
+</tr>
+<tr>
+<td align="left">将当前行变成小写</td>
+<td align="left"><code>guu</code></td>
+</tr>
+<tr>
+<td align="left">将当前行变成大写</td>
+<td align="left"><code>gUU</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="section-7">选择</h3>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">选中上一次选择的区域</td>
+<td align="left"><code>gv</code></td>
+</tr>
+<tr>
+<td align="left">选中括号内区域</td>
+<td align="left"><code>vi{</code>、<code>vi[</code>、<code>vi(</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="section-8">搜索</h3>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">向下查找字符串</td>
+<td align="left"><code>/str</code></td>
+</tr>
+<tr>
+<td align="left">向上查找字符串</td>
+<td align="left"><code>?str</code></td>
+</tr>
+<tr>
+<td align="left">查找下一个</td>
+<td align="left"><code>n</code></td>
+</tr>
+<tr>
+<td align="left">查找上一个</td>
+<td align="left"><code>N</code></td>
+</tr>
+<tr>
+<td align="left">向下查找光标所在单词</td>
+<td align="left"><code>*</code></td>
+</tr>
+<tr>
+<td align="left">向下查找光标所在单词</td>
+<td align="left"><code>#</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="section-9">正则表达式</h3>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">匹配单词左边界</td>
+<td align="left"><code>\&lt;</code></td>
+</tr>
+<tr>
+<td align="left">匹配单词右边界</td>
+<td align="left"><code>\&gt;</code></td>
+</tr>
+<tr>
+<td align="left">去重</td>
+<td align="left"><code>:g/^\(.*\)$\n\1/d</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="section-10">常用</h3>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">删除空行</td>
+<td align="left"><code>:g/^$/d</code></td>
+</tr>
+<tr>
+<td align="left">撤销/UNDO</td>
+<td align="left"><code>u</code></td>
+</tr>
+<tr>
+<td align="left">重做/REDO</td>
+<td align="left"><code>C-r</code></td>
+</tr>
+<tr>
+<td align="left">统计行/单词/字符/字节数</td>
+<td align="left"><code>g C-g</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="section-11">全局</h3>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">退出</td>
+<td align="left"><code>:q</code></td>
+</tr>
+<tr>
+<td align="left">强制执行</td>
+<td align="left"><code>!</code></td>
+</tr>
+<tr>
+<td align="left">执行外部命令</td>
+<td align="left"><code>:!</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="section-12">文件操作</h3>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">打开</td>
+<td align="left"><code>:e</code></td>
+</tr>
+<tr>
+<td align="left">打开文件对话框</td>
+<td align="left"><code>:bro e</code></td>
+</tr>
+<tr>
+<td align="left">保存</td>
+<td align="left"><code>:w</code></td>
+</tr>
+<tr>
+<td align="left">另存为对话框</td>
+<td align="left"><code>:bro w</code></td>
+</tr>
+<tr>
+<td align="left">查看历史文件列表</td>
+<td align="left"><code>:ol</code></td>
+</tr>
+<tr>
+<td align="left">查看并打开历史文件</td>
+<td align="left"><code>:bro ol</code></td>
+</tr>
+<tr>
+<td align="left">重命名当前文件</td>
+<td align="left"><code>:f filename</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="vimdiff">vimdiff</h3>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">移动到上一个不同处</td>
+<td align="left"><code>[c</code></td>
+</tr>
+<tr>
+<td align="left">移动到下一个不同处</td>
+<td align="left"><code>]c</code></td>
+</tr>
+<tr>
+<td align="left">该差异点使用当前文件的</td>
+<td align="left"><code>dp</code></td>
+</tr>
+<tr>
+<td align="left">该差异点使用其它文件的</td>
+<td align="left"><code>do</code></td>
+</tr>
+<tr>
+<td align="left">手动刷新重新比较</td>
+<td align="left"><code>:diffupdate</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="buffer">Buffer</h3>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">查看 Buffer 列表</td>
+<td align="left"><code>:ls</code></td>
+</tr>
+<tr>
+<td align="left">转到 Buffer 列表中的下一个 Buffer</td>
+<td align="left"><code>:bn</code></td>
+</tr>
+<tr>
+<td align="left">转到 Buffer 列表中的上一个 Buffer</td>
+<td align="left"><code>:bp</code></td>
+</tr>
+<tr>
+<td align="left">转到 Buffer 列表中的 num 号 Buffer</td>
+<td align="left"><code>:bnum</code></td>
+</tr>
+<tr>
+<td align="left">你之前待过的一个 Buffer</td>
+<td align="left"><code>:b#</code></td>
+</tr>
+<tr>
+<td align="left">从 Buffer 列表中删除 num 号 Buffer</td>
+<td align="left"><code>:bdnum</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="section-13">组合命令</h3>
+<p>可以使用 <code>|</code> 来组合命令，比如 <code>cmd1 | cmd2</code>。</p>
+<h3 id="section-14">代码</h3>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">格式化代码</td>
+<td align="left"><code>gg=G</code></td>
+</tr>
+<tr>
+<td align="left">去除 1-20 行首的行号</td>
+<td align="left"><code>:1,20s/^\\s\*[0-9]\*\\s\*//g</code></td>
+</tr>
+<tr>
+<td align="left">展开全部折叠</td>
+<td align="left"><code>zR</code></td>
+</tr>
+<tr>
+<td align="left">展开当前层级折叠</td>
+<td align="left"><code>zr</code></td>
+</tr>
+<tr>
+<td align="left">全部折叠</td>
+<td align="left"><code>zM</code></td>
+</tr>
+<tr>
+<td align="left">当前层级折叠</td>
+<td align="left"><code>zm</code></td>
+</tr>
+<tr>
+<td align="left">切换折叠/展开</td>
+<td align="left"><code>za</code></td>
+</tr>
+<tr>
+<td align="left">递归折叠/展开当前大区块</td>
+<td align="left"><code>zA</code></td>
+</tr>
+<tr>
+<td align="left">折叠当前区块</td>
+<td align="left"><code>zc</code></td>
+</tr>
+<tr>
+<td align="left">递归折叠当前大区块</td>
+<td align="left"><code>zC</code></td>
+</tr>
+<tr>
+<td align="left">展开当前区块</td>
+<td align="left"><code>zo</code></td>
+</tr>
+<tr>
+<td align="left">递归展开当前大区块</td>
+<td align="left"><code>zO</code></td>
+</tr>
+<tr>
+<td align="left">格式化 json 数据</td>
+<td align="left"><code>:%!python -m json.tool</code></td>
+</tr>
+<tr>
+<td align="left">缩进当前行</td>
+<td align="left"><code>&gt;&gt;</code></td>
+</tr>
+<tr>
+<td align="left">反缩进当前行</td>
+<td align="left"><code>&lt;&lt;</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="section-15">插件</h3>
+<h4 id="ctrlp">CtrlP</h4>
+<p>基础按键 <code>C-p</code></p>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">刷新列表</td>
+<td align="left"><code>F5</code></td>
+</tr>
+<tr>
+<td align="left">切换文件/缓冲区/MRU</td>
+<td align="left"><code>C-f/b</code></td>
+</tr>
+<tr>
+<td align="left">切换全路径搜索/文件名搜索</td>
+<td align="left"><code>C-d</code></td>
+</tr>
+<tr>
+<td align="left">切换正则表达式模式</td>
+<td align="left"><code>C-r</code></td>
+</tr>
+<tr>
+<td align="left">上/下一个选项</td>
+<td align="left"><code>C-k/j</code></td>
+</tr>
+<tr>
+<td align="left">在新标签/垂直分割/水平分割打开文件</td>
+<td align="left"><code>C-t/v/x</code></td>
+</tr>
+<tr>
+<td align="left">历史选择记录的上/下一条</td>
+<td align="left"><code>C-p/n</code></td>
+</tr>
+<tr>
+<td align="left">创建文件和它的父路径</td>
+<td align="left"><code>C-y</code></td>
+</tr>
+<tr>
+<td align="left">标记并打开多个文件</td>
+<td align="left"><code>C-z C-o</code></td>
+</tr>
+<tr>
+<td align="left">退出 CtrlP</td>
+<td align="left"><code>C-c</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="leaderf">LeaderF</h4>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">打开文件</td>
+<td align="left"><code>Leader-f</code></td>
+</tr>
+<tr>
+<td align="left">打开缓冲区</td>
+<td align="left"><code>Leader-b</code></td>
+</tr>
+<tr>
+<td align="left">打开 MRU</td>
+<td align="left"><code>Leader-m</code>（自定义的）</td>
+</tr>
+<tr>
+<td align="left">退出</td>
+<td align="left"><code>C-c</code></td>
+</tr>
+<tr>
+<td align="left">切换模糊查找和正则查找</td>
+<td align="left"><code>C-r</code></td>
+</tr>
+<tr>
+<td align="left">粘贴</td>
+<td align="left"><code>C-v</code></td>
+</tr>
+<tr>
+<td align="left">清空输入</td>
+<td align="left"><code>C-u</code></td>
+</tr>
+<tr>
+<td align="left">上/下一个选项</td>
+<td align="left"><code>C-k/j</code></td>
+</tr>
+<tr>
+<td align="left">在新标签/垂直分割/水平分割打开文件</td>
+<td align="left"><code>C-t/]/v</code></td>
+</tr>
+<tr>
+<td align="left">刷新列表</td>
+<td align="left"><code>F5</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="vim-table-mode">vim-table-mode</h4>
+<table>
+<thead>
+<tr>
+<th align="left">功能</th>
+<th align="left">按键</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">删除列</td>
+<td align="left"><code>Leader-tdc</code></td>
+</tr>
+<tr>
+<td align="left">删除行</td>
+<td align="left"><code>Leader-tdd</code></td>
+</tr>
+<tr>
+<td align="left">重新格式化表格</td>
+<td align="left"><code>Leader-tr</code></td>
+</tr>
+</tbody>
+</table>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/wiki/vim/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

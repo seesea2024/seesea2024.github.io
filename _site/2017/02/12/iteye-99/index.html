@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>AJAX学习笔记 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/02/12/iteye-99/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="AJAX学习笔记">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="在用IFrame做Ajax时，需要考虑的有：先定义隐藏的IFrame&lt;iframe name="myIframe" src="blank.html" style="width:0px;height:0px" frameborder="0"&gt; &lt;/iframe&gt;通过button,Href或者form提交，动态修改IFrame的src属性或者设置Href,Form的Target属性如何在父窗口和IFrame页面传递数据Three ways of Moving Data From an iframe to the ParentThe iframe page can use it's own javascripts to transfer and place the data into the parent.&lt;script&gt;     // - this is the script in the iframe results page     var reps = document.getElementById('state_reps').innerHTML;     parent.document.getElementById('results1').innerHTML = reps; &lt;/script&gt;     The iframe page can pass its document object as an argument to a function in the parent, thereby allowing the parent to retrieve data from the iframe.  &lt;script&gt;     // - this is the script in parent page     function showReps(doc){         var x = doc.getElementById('state_reps').innerHTML;         document.getElementById('results2').innerHTML = x;     } &lt;/script&gt;    Place an onload event handler in the iframe tag in the parent document (this page). This method does not work with Netscape    &lt;iframe name="repIframe3" src="blank.html" onload="getIframeDoc()"&gt;&lt;/iframe&gt;    &lt;script&gt;         function getIframeDoc(){             var iframeDoc = window.frames['repIframe3'].document;             var sr = iframeDoc.getElementById('state_reps');             if (sr){                 var reps3 = sr.innerHTML;                 document.getElementById('results3').innerHTML = reps3;             }         }     &lt;/script&gt;            &lt;script&gt;         // - this is the script in the iframe results page         parent.showReps(document);     &lt;/script&gt;">
+    <meta name="og:description" content="在用IFrame做Ajax时，需要考虑的有：先定义隐藏的IFrame&lt;iframe name="myIframe" src="blank.html" style="width:0px;height:0px" frameborder="0"&gt; &lt;/iframe&gt;通过button,Href或者form提交，动态修改IFrame的src属性或者设置Href,Form的Target属性如何在父窗口和IFrame页面传递数据Three ways of Moving Data From an iframe to the ParentThe iframe page can use it's own javascripts to transfer and place the data into the parent.&lt;script&gt;     // - this is the script in the iframe results page     var reps = document.getElementById('state_reps').innerHTML;     parent.document.getElementById('results1').innerHTML = reps; &lt;/script&gt;     The iframe page can pass its document object as an argument to a function in the parent, thereby allowing the parent to retrieve data from the iframe.  &lt;script&gt;     // - this is the script in parent page     function showReps(doc){         var x = doc.getElementById('state_reps').innerHTML;         document.getElementById('results2').innerHTML = x;     } &lt;/script&gt;    Place an onload event handler in the iframe tag in the parent document (this page). This method does not work with Netscape    &lt;iframe name="repIframe3" src="blank.html" onload="getIframeDoc()"&gt;&lt;/iframe&gt;    &lt;script&gt;         function getIframeDoc(){             var iframeDoc = window.frames['repIframe3'].document;             var sr = iframeDoc.getElementById('state_reps');             if (sr){                 var reps3 = sr.innerHTML;                 document.getElementById('results3').innerHTML = reps3;             }         }     &lt;/script&gt;            &lt;script&gt;         // - this is the script in the iframe results page         parent.showReps(document);     &lt;/script&gt;">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/02/12/iteye-99/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-02-12">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="AJAX学习笔记">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">AJAX学习笔记</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/02/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#iteye" title="iteye">iteye</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>在用IFrame做Ajax时，需要考虑的有：</p>
+<ul>
+<li>先定义隐藏的IFrame</li>
+</ul>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;iframe</span> <span class="na">name=</span><span class="s">"myIframe"</span> <span class="na">src=</span><span class="s">"blank.html"</span> <span class="na">style=</span><span class="s">"width:0px;height:0px"</span> <span class="na">frameborder=</span><span class="s">"0"</span><span class="nt">&gt;</span> <span class="nt">&lt;/iframe&gt;</span>
+</code></pre></div></div>
+<ul>
+<li>
+<p>通过button,Href或者form提交，动态修改IFrame的src属性或者设置Href,Form的Target属性</p>
+</li>
+<li>
+<p>如何在父窗口和IFrame页面传递数据</p>
+</li>
+</ul>
+<p>Three ways of Moving Data From an iframe to the Parent</p>
+<ul>
+<li>The iframe page can use it's own javascripts to transfer and place the data into the parent.</li>
+</ul>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+     <span class="c1">// - this is the script in the iframe results page </span>
+    <span class="kd">var</span> <span class="nx">reps</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">state_reps</span><span class="dl">'</span><span class="p">).</span><span class="nx">innerHTML</span><span class="p">;</span> 
+    <span class="nx">parent</span><span class="p">.</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">results1</span><span class="dl">'</span><span class="p">).</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">reps</span><span class="p">;</span> 
+<span class="o">&lt;</span><span class="sr">/script&gt;    </span><span class="err"> 
+</span></code></pre></div></div>
+<ul>
+<li>The iframe page can pass its document object as an argument to a function in the parent, thereby allowing the parent to retrieve data from the iframe.</li>
+</ul>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span> 
+    <span class="c1">// - this is the script in parent page </span>
+    <span class="kd">function</span> <span class="nx">showReps</span><span class="p">(</span><span class="nx">doc</span><span class="p">){</span> 
+        <span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">state_reps</span><span class="dl">'</span><span class="p">).</span><span class="nx">innerHTML</span><span class="p">;</span> 
+        <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">results2</span><span class="dl">'</span><span class="p">).</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">x</span><span class="p">;</span> 
+    <span class="p">}</span> 
+<span class="o">&lt;</span><span class="sr">/script&gt;   </span><span class="err"> 
+</span></code></pre></div></div>
+<ul>
+<li>Place an onload event handler in the iframe tag in the parent document (this page). This method does not work with Netscape</li>
+</ul>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="o">&lt;</span><span class="nx">iframe</span> <span class="nx">name</span><span class="o">=</span><span class="dl">"</span><span class="s2">repIframe3</span><span class="dl">"</span> <span class="nx">src</span><span class="o">=</span><span class="dl">"</span><span class="s2">blank.html</span><span class="dl">"</span> <span class="nx">onload</span><span class="o">=</span><span class="dl">"</span><span class="s2">getIframeDoc()</span><span class="dl">"</span><span class="o">&gt;&lt;</span><span class="sr">/iframe</span><span class="err">&gt;
+</span>    <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span> 
+        <span class="kd">function</span> <span class="nx">getIframeDoc</span><span class="p">(){</span> 
+            <span class="kd">var</span> <span class="nx">iframeDoc</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">frames</span><span class="p">[</span><span class="dl">'</span><span class="s1">repIframe3</span><span class="dl">'</span><span class="p">].</span><span class="nb">document</span><span class="p">;</span> 
+            <span class="kd">var</span> <span class="nx">sr</span> <span class="o">=</span> <span class="nx">iframeDoc</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">state_reps</span><span class="dl">'</span><span class="p">);</span> 
+            <span class="k">if</span> <span class="p">(</span><span class="nx">sr</span><span class="p">){</span> 
+                <span class="kd">var</span> <span class="nx">reps3</span> <span class="o">=</span> <span class="nx">sr</span><span class="p">.</span><span class="nx">innerHTML</span><span class="p">;</span> 
+                <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">results3</span><span class="dl">'</span><span class="p">).</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">reps3</span><span class="p">;</span> 
+            <span class="p">}</span> 
+        <span class="p">}</span> 
+    <span class="o">&lt;</span><span class="sr">/script&gt;       </span><span class="err"> 
+</span>    <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span> 
+        <span class="c1">// - this is the script in the iframe results page </span>
+        <span class="nx">parent</span><span class="p">.</span><span class="nx">showReps</span><span class="p">(</span><span class="nb">document</span><span class="p">);</span> 
+    <span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span></code></pre></div></div>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/02/12/iteye-99/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

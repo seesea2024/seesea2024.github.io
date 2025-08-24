@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>WAS Cell, Node, Profile, Server &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/02/12/iteye-55/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="WAS Cell, Node, Profile, Server">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="Cell 单元是整个分布式网络中一个或多个节点的逻辑分组。单元是一个配置概念，是管理员将节点间逻辑关联起来的实现方法。管理员根据具体的业务环境，制定对其整体系统集成环境有意义的条件来定义和组织构成单元的节点。就一般情况来说，可以将单元看作是最大的作用域。 　　在 IBM WAS ND 产品中，管理配置数据都存储在 XML 文件中。单元保留了它每个节点中每台服务器的主配置文件。同时每个节点和服务器也有其自己的本地配置文件。如果服务器已经属于单元，则对于本地节点或服务器配置文件的更改都是临时的，通过在本地提交更改生效时，本地更改覆盖单元配置，但是当执行单元配置文档同步到节点的操作时，在单元级别上对主控服务器和主节点配置文件所作的更改将会替换对该节点所作的任何临时更改。     2. Node 节点是受管服务器（Server）的逻辑分组。节点通常与具有唯一 IP 主机地址的逻辑或物理计算机系统对应，节点不能跨多台计算机。节点分为受管节点与非受管节点       3. Node=Profile。 WebSphere Application Server V6 引进了概要文件（profile）概念，目的是将产品的二进制文件（binaries）与用户数据物理分离，并使用户能定义多组用户数据。通常情况下，用户数据包括配置文件、部署的应用程序、日志文件和临时工作区等   WebSphere Application Server V6 产品安装程序将创建的文件分别放在两个隔离的环境中：一个用于安装产品二进制文件(Websphere 安装程序)，另一个用于创建初始概要文件。   Node 是管理上使用的概念，Profile 是实际的概要文件，它们代表同一事物。Server 就是所谓的 Application Server Instance , 这是我们实际要布署 Application 的地方。在IBM WAS ND 产品中受管节点的 Node Agent 目的就是让 Deployment Manager Server 可以透过 Node Agent 来管 Node (Profile) 中的 Application Server Instance，一个 Node (Profile) 中可以有多个 Application Server Instance。 　　如果是非 ND 版本 , 则属于 Single Server 版本，那么一个 Node (Profile) 中只能有一个 Application Server Instance，如果你希望在一台机器上有多个 Application Server Instance，那就只能透过创建多个 Profile (Node) 来达成，但这些 Node (Porfile) 彼此独立没有管理上的关系 (RelationShip)，只要使用的 TCP/IP Port 不要冲突即可。         From: http://www.webspherechina.net/?viewnews-5560.html">
+    <meta name="og:description" content="Cell 单元是整个分布式网络中一个或多个节点的逻辑分组。单元是一个配置概念，是管理员将节点间逻辑关联起来的实现方法。管理员根据具体的业务环境，制定对其整体系统集成环境有意义的条件来定义和组织构成单元的节点。就一般情况来说，可以将单元看作是最大的作用域。 　　在 IBM WAS ND 产品中，管理配置数据都存储在 XML 文件中。单元保留了它每个节点中每台服务器的主配置文件。同时每个节点和服务器也有其自己的本地配置文件。如果服务器已经属于单元，则对于本地节点或服务器配置文件的更改都是临时的，通过在本地提交更改生效时，本地更改覆盖单元配置，但是当执行单元配置文档同步到节点的操作时，在单元级别上对主控服务器和主节点配置文件所作的更改将会替换对该节点所作的任何临时更改。     2. Node 节点是受管服务器（Server）的逻辑分组。节点通常与具有唯一 IP 主机地址的逻辑或物理计算机系统对应，节点不能跨多台计算机。节点分为受管节点与非受管节点       3. Node=Profile。 WebSphere Application Server V6 引进了概要文件（profile）概念，目的是将产品的二进制文件（binaries）与用户数据物理分离，并使用户能定义多组用户数据。通常情况下，用户数据包括配置文件、部署的应用程序、日志文件和临时工作区等   WebSphere Application Server V6 产品安装程序将创建的文件分别放在两个隔离的环境中：一个用于安装产品二进制文件(Websphere 安装程序)，另一个用于创建初始概要文件。   Node 是管理上使用的概念，Profile 是实际的概要文件，它们代表同一事物。Server 就是所谓的 Application Server Instance , 这是我们实际要布署 Application 的地方。在IBM WAS ND 产品中受管节点的 Node Agent 目的就是让 Deployment Manager Server 可以透过 Node Agent 来管 Node (Profile) 中的 Application Server Instance，一个 Node (Profile) 中可以有多个 Application Server Instance。 　　如果是非 ND 版本 , 则属于 Single Server 版本，那么一个 Node (Profile) 中只能有一个 Application Server Instance，如果你希望在一台机器上有多个 Application Server Instance，那就只能透过创建多个 Profile (Node) 来达成，但这些 Node (Porfile) 彼此独立没有管理上的关系 (RelationShip)，只要使用的 TCP/IP Port 不要冲突即可。         From: http://www.webspherechina.net/?viewnews-5560.html">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/02/12/iteye-55/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-02-12">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="WAS Cell, Node,">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">WAS Cell, Node, Profile, Server</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/02/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#iteye" title="iteye">iteye</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <ol>
+<li>Cell 单元是整个分布式网络中一个或多个节点的逻辑分组。单元是一个配置概念，是管理员将节点间逻辑关联起来的实现方法。管理员根据具体的业务环境，制定对其整体系统集成环境有意义的条件来定义和组织构成单元的节点。就一般情况来说，可以将单元看作是最大的作用域。 　　在 IBM WAS ND 产品中，管理配置数据都存储在 XML 文件中。单元保留了它每个节点中每台服务器的主配置文件。同时每个节点和服务器也有其自己的本地配置文件。如果服务器已经属于单元，则对于本地节点或服务器配置文件的更改都是临时的，通过在本地提交更改生效时，本地更改覆盖单元配置，但是当执行单元配置文档同步到节点的操作时，在单元级别上对主控服务器和主节点配置文件所作的更改将会替换对该节点所作的任何临时更改。     2. Node 节点是受管服务器（Server）的逻辑分组。节点通常与具有唯一 IP 主机地址的逻辑或物理计算机系统对应，节点不能跨多台计算机。节点分为受管节点与非受管节点       3. Node=Profile。 WebSphere Application Server V6 引进了概要文件（profile）概念，目的是将产品的二进制文件（binaries）与用户数据物理分离，并使用户能定义多组用户数据。通常情况下，用户数据包括配置文件、部署的应用程序、日志文件和临时工作区等   WebSphere Application Server V6 产品安装程序将创建的文件分别放在两个隔离的环境中：一个用于安装产品二进制文件(Websphere 安装程序)，另一个用于创建初始概要文件。   Node 是管理上使用的概念，Profile 是实际的概要文件，它们代表同一事物。Server 就是所谓的 Application Server Instance , 这是我们实际要布署 Application 的地方。在IBM WAS ND 产品中受管节点的 Node Agent 目的就是让 Deployment Manager Server 可以透过 Node Agent 来管 Node (Profile) 中的 Application Server Instance，一个 Node (Profile) 中可以有多个 Application Server Instance。 　　如果是非 ND 版本 , 则属于 Single Server 版本，那么一个 Node (Profile) 中只能有一个 Application Server Instance，如果你希望在一台机器上有多个 Application Server Instance，那就只能透过创建多个 Profile (Node) 来达成，但这些 Node (Porfile) 彼此独立没有管理上的关系 (RelationShip)，只要使用的 TCP/IP Port 不要冲突即可。         From: <a href="http://www.webspherechina.net/?viewnews-5560.html">http://www.webspherechina.net/?viewnews-5560.html</a></li>
+</ol>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/02/12/iteye-55/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

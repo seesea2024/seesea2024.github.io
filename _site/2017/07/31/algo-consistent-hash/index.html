@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>consistent hash 实现 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/07/31/algo-consistent-hash/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="consistent hash 实现">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="摘自:https://github.com/it-interview/easy-job/blob/master/java/%E4%B8%80%E8%87%B4%E6%80%A7Hash%E7%AE%97%E6%B3%95.md">
+    <meta name="og:description" content="摘自:https://github.com/it-interview/easy-job/blob/master/java/%E4%B8%80%E8%87%B4%E6%80%A7Hash%E7%AE%97%E6%B3%95.md">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/07/31/algo-consistent-hash/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-31">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="consistent hash">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">consistent hash 实现</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/31
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#algo" title="algo">algo</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths">
+    <article class="article-content markdown-body">
+    <p>摘自:<a href="https://github.com/it-interview/easy-job/blob/master/java/%E4%B8%80%E8%87%B4%E6%80%A7Hash%E7%AE%97%E6%B3%95.md">https://github.com/it-interview/easy-job/blob/master/java/%E4%B8%80%E8%87%B4%E6%80%A7Hash%E7%AE%97%E6%B3%95.md</a></p>
+<p>一致性Hash算法</p>
+<p>1.为什么要使用一致性Hash</p>
+<p>解决余数Hash算法在服务器集群的路由映射中诸多问题。</p>
+<p>1、余数Hash</p>
+<p>由于HashCode随机性比较强，所以使用余数Hash路由算法就可以保证缓存数据在整个Cache服务器集群中有比较均衡的分布。</p>
+<p>如果不考虑服务器集群的伸缩性，那么余数Hash算法几乎可以满足绝大多数的缓存路由需求，但是当分布式缓存集群需要扩容或者某些服务器下线或宕机的时候，就难办了。</p>
+<p>比如说服务器扩容，更改服务器列表，仍然使用余数Hash，它会导致大量缓存无法命中。（其实不仅仅是无法命中，那些大量的无法命中的数据还在原缓存中在被移除前占据着内存）。大部分的业务数据度操作请求上事实上是通过缓存获取的，只有少量读操作会访问数据库，因此数据库的负载能力是以有缓存为前提而设计的。当大部分被缓存了的数据因为服务器扩容而不能正确读取时，这些数据访问的压力就落在了数据库的身上，这将大大超过数据库的负载能力，严重的可能会导致数据库宕机。</p>
+<p>这个问题有解决方案，解决步骤为：</p>
+<p>（1）在网站访问量低谷，通常是深夜，技术团队加班，扩容、重启服务器</p>
+<p>（2）通过模拟请求的方式逐渐预热缓存，使缓存服务器中的数据重新分布</p>
+<p>2、一致性Hash</p>
+<p>一致性Hash算法通过一个叫做一致性Hash环的数据结构实现Key到缓存服务器的Hash映射。</p>
+<p>算法的具体原理这里再次贴上：</p>
+<pre><code>先构造一个长度为2^32的整数环（这个环被称为一致性Hash环），根据节点名称的Hash值（其分布为[0, 2^32-1]）将服务器节点放置在这个Hash环上，然后根据需要的缓存的数据的Key值计算其Hash值（其分布也为[0, 2^32-1]），接着在Hash环上顺时针查找距离这个Key值的Hash值最近的服务器节点，完成Key到服务器的映射查找。
+</code></pre>
+<p>采用一致性Hash算法，的确也会影响到服务器集群，但是影响的只是某一段而已，相比余数Hash算法影响了远超一半的影响率，这种影响要小得多。更重要的是，集群中缓存服务器节点越多，增加节点带来的影响越小，很好理解。换句话说，随着集群规模的增大，继续命中原有缓存数据的概率会越来越大，虽然仍然有小部分数据缓存在服务器中不能被读到，但是这个比例足够小，即使访问数据库，也不会对数据库造成致命的负载压力。</p>
+<p>这种算法解决了普通余数Hash算法伸缩性差的问题，可以保证在上线、下线缓存服务器的情况下尽量有多的请求命中原来路由到的缓存服务器。</p>
+<p>当然，万事不可能十全十美，一致性Hash算法比普通的余数Hash算法更具有伸缩性，但是同时其算法实现也更为复杂。</p>
+<h3 id="section">数据结构的选取</h3>
+<p>一致性Hash算法最先要考虑的一个问题是：构造出一个长度为232的整数环，根据节点名称的Hash值将服务器节点放置在这个Hash环上。</p>
+<p>那么，整数环应该使用何种数据结构，才能使得运行时的时间复杂度最低？首先说明一点，关于时间复杂度，常见的时间复杂度与时间效率的关系有如下的经验规则：</p>
+<p>O(1) &lt; O(log2N) &lt; O(n) &lt; O(N * log2N) &lt; O(N2) &lt; O(N3) &lt; 2N &lt; 3N &lt; N!</p>
+<p>一般来说，前四个效率比较高，中间两个差强人意，后三个比较差（只要N比较大，这个算法就动不了了）。OK，继续前面的话题，应该如何选取数据结构，我认为有以下几种可行的解决方案。</p>
+<p><strong>1、解决方案一：排序+List</strong></p>
+<p>我想到的第一种思路是：算出所有待加入数据结构的节点名称的Hash值放入一个数组中，然后使用某种排序算法将其从小到大进行排序，最后将排序后的数据放入List中，采用List而不是数组是为了结点的扩展考虑。</p>
+<p><strong>之后，待路由的结点，只需要在List中找到第一个Hash值比它大的服务器节点就可以了</strong>，比如服务器节点的Hash值是[0,2,4,6,8,10]，带路由的结点是7，只需要找到第一个比7大的整数，也就是8，就是我们最终需要路由过去的服务器节点。</p>
+<p>如果暂时不考虑前面的排序，那么这种解决方案的时间复杂度：</p>
+<p>（1）最好的情况是第一次就找到，时间复杂度为O(1)</p>
+<p>（2）最坏的情况是最后一次才找到，时间复杂度为O(N)</p>
+<p>平均下来时间复杂度为O(0.5N+0.5)，忽略首项系数和常数，时间复杂度为O(N)。</p>
+<p>但是如果考虑到之前的排序，我在网上找了张图，提供了各种排序算法的时间复杂度。</p>
+<p><img src="http://jbcdn2.b0.upaiyun.com/2016/03/571ced55f98a690865562a6c2e199963.jpg" alt=""></p>
+<p>看得出来，排序算法要么稳定但是时间复杂度高、要么时间复杂度低但不稳定，看起来最好的归并排序法的时间复杂度仍然有O(N * logN)，稍微耗费性能了一些。</p>
+<p><strong>2、解决方案二：遍历+List</strong></p>
+<p>既然排序操作比较耗性能，那么能不能不排序？可以的，所以进一步的，有了第二种解决方案。</p>
+<p>解决方案使用List不变，不过可以采用遍历的方式：</p>
+<p>（1）服务器节点不排序，其Hash值全部直接放入一个List中</p>
+<p>（2）待路由的节点，算出其Hash值，由于指明了”顺时针”，因此遍历List，比待路由的节点Hash值大的算出差值并记录，比待路由节点Hash值小的忽略</p>
+<p>（3）算出所有的差值之后，最小的那个，就是最终需要路由过去的节点</p>
+<p>在这个算法中，看一下时间复杂度：</p>
+<p>1、最好情况是只有一个服务器节点的Hash值大于带路由结点的Hash值，其时间复杂度是O(N)+O(1)=O(N+1)，忽略常数项，即O(N)</p>
+<p>2、最坏情况是所有服务器节点的Hash值都大于带路由结点的Hash值，其时间复杂度是O(N)+O(N)=O(2N)，忽略首项系数，即O(N)</p>
+<p>所以，总的时间复杂度就是O(N)。其实算法还能更改进一些：给一个位置变量X，如果新的差值比原差值小，X替换为新的位置，否则X不变。这样遍历就减少了一轮，不过经过改进后的算法时间复杂度仍为O(N)。</p>
+<p>总而言之，这个解决方案和解决方案一相比，总体来看，似乎更好了一些。</p>
+<p><strong>3、解决方案三：二叉查找树</strong></p>
+<p>抛开List这种数据结构，另一种数据结构则是使用<strong>二叉查找树</strong>。</p>
+<p>当然我们不能简单地使用二叉查找树，因为可能出现不平衡的情况。平衡二叉查找树有AVL树、红黑树等，这里使用红黑树，选用红黑树的原因有两点：</p>
+<p>1、红黑树主要的作用是用于存储有序的数据，这其实和第一种解决方案的思路又不谋而合了，但是它的效率非常高</p>
+<p>2、JDK里面提供了红黑树的代码实现TreeMap和TreeSet</p>
+<p>另外，以TreeMap为例，TreeMap本身提供了一个tailMap(K fromKey)方法，支持从红黑树中查找比fromKey大的值的集合，但并不需要遍历整个数据结构。</p>
+<p>使用红黑树，可以使得查找的时间复杂度降低为O(logN)，比上面两种解决方案，效率大大提升。</p>
+<p>为了验证这个说法，我做了一次测试，从大量数据中查找第一个大于其中间值的那个数据，比如10000数据就找第一个大于5000的数据（模拟平均的情况）。看一下O(N)时间复杂度和O(logN)时间复杂度运行效率的对比：</p>
+<p><img src="http://7xlkoc.com1.z0.glb.clouddn.com/hash1.jpg" alt=""></p>
+<p>因为再大就内存溢出了，所以只测试到4000000数据。可以看到，数据查找的效率，TreeMap是完胜的，其实再增大数据测试也是一样的，红黑树的数据结构决定了任何一个大于N的最小数据，它都只需要几次至几十次查找就可以查到。</p>
+<p>当然，明确一点，有利必有弊，根据我另外一次测试得到的结论是，<strong>为了维护红黑树，数据插入效率TreeMap在三种数据结构里面是最差的，且插入要慢上5~10倍。</strong></p>
+<h3 id="hash">Hash值重新计算</h3>
+<p>服务器节点我们肯定用字符串来表示，比如”192.168.1.1″、”192.168.1.2″，根据字符串得到其Hash值，那么另外一个重要的问题就是Hash值要重新计算，这个问题是我在测试String的hashCode()方法的时候发现的，不妨来看一下为什么要重新计算Hash值：</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+* String的hashCode()方法运算结果查看
+* @author 哓哓
+*
+*/</span>
+ 
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StringHashCodeTest</span>
+<span class="o">{</span>
+   <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span>
+   <span class="o">{</span>
+     <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"192.168.0.0:111的哈希值："</span> <span class="o">+</span> <span class="s">"192.168.0.0:1111"</span><span class="o">.</span><span class="na">hashCode</span><span class="o">());</span>
+     <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"192.168.0.1:111的哈希值："</span> <span class="o">+</span> <span class="s">"192.168.0.1:1111"</span><span class="o">.</span><span class="na">hashCode</span><span class="o">());</span>
+     <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"192.168.0.2:111的哈希值："</span> <span class="o">+</span> <span class="s">"192.168.0.2:1111"</span><span class="o">.</span><span class="na">hashCode</span><span class="o">());</span>
+     <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"192.168.0.3:111的哈希值："</span> <span class="o">+</span> <span class="s">"192.168.0.3:1111"</span><span class="o">.</span><span class="na">hashCode</span><span class="o">());</span>
+     <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"192.168.0.4:111的哈希值："</span> <span class="o">+</span> <span class="s">"192.168.0.4:1111"</span><span class="o">.</span><span class="na">hashCode</span><span class="o">());</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+<p>我们在做集群的时候，集群点的IP以这种连续的形式存在是很正常的。看一下运行结果为：</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mf">192.168</span><span class="o">.</span><span class="mf">0.0</span><span class="o">:</span><span class="mi">111</span><span class="n">的哈希值</span><span class="err">：</span><span class="mi">1845870087</span>
+<span class="mf">192.168</span><span class="o">.</span><span class="mf">0.1</span><span class="o">:</span><span class="mi">111</span><span class="n">的哈希值</span><span class="err">：</span><span class="mi">1874499238</span>
+<span class="mf">192.168</span><span class="o">.</span><span class="mf">0.2</span><span class="o">:</span><span class="mi">111</span><span class="n">的哈希值</span><span class="err">：</span><span class="mi">1903128389</span>
+<span class="mf">192.168</span><span class="o">.</span><span class="mf">0.3</span><span class="o">:</span><span class="mi">111</span><span class="n">的哈希值</span><span class="err">：</span><span class="mi">1931757540</span>
+<span class="mf">192.168</span><span class="o">.</span><span class="mf">0.4</span><span class="o">:</span><span class="mi">111</span><span class="n">的哈希值</span><span class="err">：</span><span class="mi">1960386691</span>
+</code></pre></div></div>
+<p>这个就问题大了，[0,2^32-1]的区间之中，5个HashCode值却只分布在这么小小的一个区间，什么概念？[0,2^32-1]中有4294967296个数字，而我们的区间只有122516605，从概率学上讲这将导致97%待路由的服务器都被路由到”192.168.0.1″这个集群点上，简直是糟糕透了！</p>
+<p>另外还有一个不好的地方：规定的区间是非负数，String的hashCode()方法却会产生负数（不信用”192.168.1.0:1111″试试看就知道了）。不过这个问题好解决，取绝对值就是一种解决的办法。</p>
+<p>综上，String重写的hashCode()方法在一致性Hash算法中没有任何实用价值，得找个算法重新计算HashCode。这种重新计算Hash值的算法有很多，比如CRC32_HASH、FNV1_32_HASH、KETAMA_HASH等，其中KETAMA_HASH是默认的MemCache推荐的一致性Hash算法，用别的Hash算法也可以，比如FNV1_32_HASH算法的计算效率就会高一些。</p>
+<p>一致性Hash算法：CRC32_HASH、KETAMA_HASH、FNV1_32_HASH、NATIVE_HASH、MYSQL_HASH</p>
+<p>一致性Hash算法实现版本1：不带虚拟节点</p>
+<p>使用一致性Hash算法，尽管增强了系统的伸缩性，但是也有可能导致负载分布不均匀，解决办法就是使用<strong>虚拟节点代替真实节点</strong>，第一个代码版本，先来个简单的，不带虚拟节点。</p>
+<p>下面来看一下不带虚拟节点的一致性Hash算法的Java代码实现：</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 不带虚拟结点的一致性Hash算法
+ * @author 哓哓
+ *
+ */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ConsistentHashWithoutVN</span> <span class="o">{</span>
+
+	<span class="cm">/**
+	 * 待加入Hash环的服务器列表
+	 */</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="nc">String</span><span class="o">[]</span> <span class="n">servers</span> <span class="o">=</span> <span class="o">{</span> <span class="s">"192.168.0.0:111"</span><span class="o">,</span> <span class="s">"192.168.0.1:111"</span><span class="o">,</span> <span class="s">"192.168.0.2:111"</span><span class="o">,</span> <span class="s">"192.168.0.3:111"</span><span class="o">,</span>
+			<span class="s">"192.168.0.4:111"</span> <span class="o">};</span>
+
+	<span class="cm">/**
+	 * key表示服务器的hash值，value表示服务器的名称
+	 */</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="nc">SortedMap</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="n">sortedMap</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">TreeMap</span><span class="o">&lt;&gt;();</span>
+
+	<span class="cm">/**
+	 * 程序初始化，将所有服务器加入集合
+	 */</span>
+	<span class="kd">static</span> <span class="o">{</span>
+		<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">servers</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+			<span class="kt">int</span> <span class="n">hash</span> <span class="o">=</span> <span class="n">getHash</span><span class="o">(</span><span class="n">servers</span><span class="o">[</span><span class="n">i</span><span class="o">]);</span>
+			 <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"["</span> <span class="o">+</span> <span class="n">servers</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">+</span> <span class="s">"]加入集群中, 其Hash值为"</span> <span class="o">+</span> <span class="n">hash</span><span class="o">);</span>
+		     <span class="n">sortedMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">servers</span><span class="o">[</span><span class="n">i</span><span class="o">]);</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+
+	<span class="cm">/**
+	 * 使用FNV1_32_HASH算法计算hash值
+	 * @param str
+	 * @return
+	 */</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">getHash</span><span class="o">(</span><span class="nc">String</span> <span class="n">str</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kd">final</span> <span class="kt">int</span> <span class="n">p</span> <span class="o">=</span> <span class="mi">16777619</span><span class="o">;</span>
+		<span class="kt">int</span> <span class="n">hash</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="mi">2166136261L</span><span class="o">;</span>
+		<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">str</span><span class="o">.</span><span class="na">length</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+			<span class="n">hash</span> <span class="o">=</span> <span class="o">(</span><span class="n">hash</span> <span class="o">^</span> <span class="n">str</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">i</span><span class="o">))</span> <span class="o">*</span> <span class="n">p</span><span class="o">;</span>
+		<span class="o">}</span>
+		<span class="n">hash</span> <span class="o">+=</span> <span class="n">hash</span> <span class="o">&lt;&lt;</span> <span class="mi">13</span><span class="o">;</span>
+		<span class="n">hash</span> <span class="o">^=</span> <span class="n">hash</span> <span class="o">&gt;&gt;</span> <span class="mi">7</span><span class="o">;</span>
+		<span class="n">hash</span> <span class="o">+=</span> <span class="n">hash</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="o">;</span>
+		<span class="n">hash</span> <span class="o">^=</span> <span class="n">hash</span> <span class="o">&gt;&gt;</span> <span class="mi">17</span><span class="o">;</span>
+		<span class="n">hash</span> <span class="o">+=</span> <span class="n">hash</span> <span class="o">&lt;&lt;</span> <span class="mi">5</span><span class="o">;</span>
+
+		<span class="c1">// 如果算出来的值为负数则取其绝对值</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">hash</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="o">)</span>
+			<span class="n">hash</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">hash</span><span class="o">);</span>
+		<span class="k">return</span> <span class="n">hash</span><span class="o">;</span>
+	<span class="o">}</span>
+	
+	<span class="kd">private</span> <span class="kd">static</span> <span class="nc">String</span> <span class="nf">matchServer</span><span class="o">(</span><span class="nc">String</span> <span class="n">node</span><span class="o">)</span> <span class="o">{</span>
+		<span class="c1">// 待路由结点的Hash值</span>
+		<span class="kt">int</span> <span class="n">hash</span> <span class="o">=</span> <span class="n">getHash</span><span class="o">(</span><span class="n">node</span><span class="o">);</span>
+		<span class="c1">// 得到大于该Hash值的子Map</span>
+		<span class="nc">SortedMap</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="n">subMap</span> <span class="o">=</span> <span class="n">sortedMap</span><span class="o">.</span><span class="na">tailMap</span><span class="o">(</span><span class="n">hash</span><span class="o">);</span>
+		<span class="c1">// 顺时针的第一个Key</span>
+		<span class="nc">Integer</span> <span class="n">i</span> <span class="o">=</span> <span class="n">subMap</span><span class="o">.</span><span class="na">firstKey</span><span class="o">();</span>
+		<span class="c1">// 返回路由到的服务器名称</span>
+		<span class="k">return</span> <span class="n">subMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+	<span class="o">}</span>
+	
+	<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+		 
+		<span class="nc">String</span><span class="o">[]</span> <span class="n">nodes</span> <span class="o">=</span> <span class="o">{</span><span class="s">"127.0.0.1:1111"</span><span class="o">,</span> <span class="s">"221.226.0.1:2222"</span><span class="o">,</span> <span class="s">"10.211.0.1:3333"</span><span class="o">};</span>
+		<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nodes</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+			<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"["</span> <span class="o">+</span> <span class="n">nodes</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">+</span> <span class="s">"]的hash值为"</span> <span class="o">+</span> <span class="n">getHash</span><span class="o">(</span><span class="n">nodes</span><span class="o">[</span><span class="n">i</span><span class="o">])</span> <span class="o">+</span> <span class="s">",被路由到的服务器为["</span> 
+		<span class="o">+</span> <span class="n">matchServer</span><span class="o">(</span><span class="n">nodes</span><span class="o">[</span><span class="n">i</span><span class="o">])</span> <span class="o">+</span> <span class="s">""</span><span class="o">);</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+	
+<span class="o">}</span>
+</code></pre></div></div>
+<p>可以运行一下看一下结果：</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span><span class="mf">192.168</span><span class="o">.</span><span class="mf">0.0</span><span class="o">:</span><span class="mi">111</span><span class="o">]</span><span class="n">加入集合中</span><span class="o">,</span> <span class="n">其Hash值为575774686</span>
+<span class="o">[</span><span class="mf">192.168</span><span class="o">.</span><span class="mf">0.1</span><span class="o">:</span><span class="mi">111</span><span class="o">]</span><span class="n">加入集合中</span><span class="o">,</span> <span class="n">其Hash值为8518713</span>
+<span class="o">[</span><span class="mf">192.168</span><span class="o">.</span><span class="mf">0.2</span><span class="o">:</span><span class="mi">111</span><span class="o">]</span><span class="n">加入集合中</span><span class="o">,</span> <span class="n">其Hash值为1361847097</span>
+<span class="o">[</span><span class="mf">192.168</span><span class="o">.</span><span class="mf">0.3</span><span class="o">:</span><span class="mi">111</span><span class="o">]</span><span class="n">加入集合中</span><span class="o">,</span> <span class="n">其Hash值为1171828661</span>
+<span class="o">[</span><span class="mf">192.168</span><span class="o">.</span><span class="mf">0.4</span><span class="o">:</span><span class="mi">111</span><span class="o">]</span><span class="n">加入集合中</span><span class="o">,</span> <span class="n">其Hash值为1764547046</span><span class="o">[</span><span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="o">:</span><span class="mi">1111</span><span class="o">]</span><span class="n">的hash值为380278925</span><span class="o">,</span> <span class="n">被路由到结点</span><span class="o">[</span><span class="mf">192.168</span><span class="o">.</span><span class="mf">0.0</span><span class="o">:</span><span class="mi">111</span><span class="o">]</span>
+<span class="o">[</span><span class="mf">221.226</span><span class="o">.</span><span class="mf">0.1</span><span class="o">:</span><span class="mi">2222</span><span class="o">]</span><span class="n">的hash值为1493545632</span><span class="o">,</span> <span class="n">被路由到结点</span><span class="o">[</span><span class="mf">192.168</span><span class="o">.</span><span class="mf">0.4</span><span class="o">:</span><span class="mi">111</span><span class="o">]</span>
+<span class="o">[</span><span class="mf">10.211</span><span class="o">.</span><span class="mf">0.1</span><span class="o">:</span><span class="mi">3333</span><span class="o">]</span><span class="n">的hash值为1393836017</span><span class="o">,</span> <span class="n">被路由到结点</span><span class="o">[</span><span class="mf">192.168</span><span class="o">.</span><span class="mf">0.4</span><span class="o">:</span><span class="mi">111</span><span class="o">]</span>
+
+</code></pre></div></div>
+<p>看到经过FNV1_32_HASH算法重新计算过后的Hash值，就比原来String的hashCode()方法好多了。从运行结果来看，也没有问题，三个点路由到的都是顺时针离他们Hash值最近的那台服务器上。</p>
+<p><strong>使用虚拟节点来改善一致性Hash算法</strong></p>
+<p>上面的一致性Hash算法实现，可以在很大程度上解决很多分布式环境下不好的路由算法导致系统伸缩性差的问题，但是会带来另外一个问题：负载不均。</p>
+<p>比如说有Hash环上有A、B、C三个服务器节点，分别有100个请求会被路由到相应服务器上。现在在A与B之间增加了一个节点D，这导致了原来会路由到B上的部分节点被路由到了D上，这样A、C上被路由到的请求明显多于B、D上的，原来三个服务器节点上均衡的负载被打破了。<strong>某种程度上来说，这失去了负载均衡的意义，因为负载均衡的目的本身就是为了使得目标服务器均分所有的请求。</strong></p>
+<p>解决这个问题的办法是引入虚拟节点，其工作原理是：**将一个物理节点拆分为多个虚拟节点，并且同一个物理节点的虚拟节点尽量均匀分布在Hash环上。**采取这样的方式，就可以有效地解决增加或减少节点时候的负载不均衡的问题。</p>
+<p>至于一个物理节点应该拆分为多少虚拟节点，下面可以先看一张图：</p>
+<p><img src="http://jbcdn2.b0.upaiyun.com/2016/03/ac5a0b944d7e9a3be41cae76f3169387.png" alt=""></p>
+<p>横轴表示需要为每台福利服务器扩展的虚拟节点倍数，纵轴表示的是实际物理服务器数。可以看出，物理服务器很少，需要更大的虚拟节点；反之物理服务器比较多，虚拟节点就可以少一些。比如有10台物理服务器，那么差不多需要为每台服务器增加100~200个虚拟节点才可以达到真正的负载均衡。</p>
+<p><strong>一致性Hash算法实现版本2：带虚拟节点</strong></p>
+<p>在理解了使用虚拟节点来改善一致性Hash算法的理论基础之后，就可以尝试开发代码了。编程方面需要考虑的问题是：</p>
+<p>1、一个真实结点如何对应成为多个虚拟节点？</p>
+<p>2、虚拟节点找到后如何还原为真实结点？</p>
+<p>这两个问题其实有很多解决办法，我这里使用了一种简单的办法，给每个真实结点后面根据虚拟节点加上后缀再取Hash值，比如”192.168.0.0:111″就把它变成”192.168.0.0:111&amp;&amp;VN0″到”192.168.0.0:111&amp;&amp;VN4″，VN就是Virtual Node的缩写，还原的时候只需要从头截取字符串到”&amp;&amp;”的位置就可以了。</p>
+<p>下面来看一下带虚拟节点的一致性Hash算法的Java代码实现：</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 带虚拟结点的一致性Hash算法
+ * 
+ * @author 哓哓
+ *
+ */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ConsistentHashWithVN</span> <span class="o">{</span>
+	<span class="cm">/**
+	 * 待加入Hash环的服务器列表
+	 */</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="nc">String</span><span class="o">[]</span> <span class="n">servers</span> <span class="o">=</span> <span class="o">{</span> <span class="s">"192.168.0.0:111"</span><span class="o">,</span> <span class="s">"192.168.0.1:111"</span><span class="o">,</span> <span class="s">"192.168.0.2:111"</span><span class="o">,</span> <span class="s">"192.168.0.3:111"</span><span class="o">,</span>
+			<span class="s">"192.168.0.4:111"</span> <span class="o">};</span>
+
+	<span class="cm">/**
+	 * 真实结点列表，考虑到服务器上线、下线的场景，即添加、删除的场景会比较频繁，这里使用LinkedList会更好
+	 */</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">realNodes</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LinkedList</span><span class="o">&lt;&gt;();</span>
+
+	<span class="cm">/**
+	 * key表示虚拟结点服务器的hash值，value表示虚拟结点服务器的名称
+	 */</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="nc">SortedMap</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="n">virtualNodes</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">TreeMap</span><span class="o">&lt;&gt;();</span>
+
+	<span class="cm">/**
+	 * 虚拟结点数目（一个真实结点对应VN_SUM个虚拟结点）
+	 */</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="no">VN_SUM</span> <span class="o">=</span> <span class="mi">5</span><span class="o">;</span>
+
+	<span class="cm">/**
+	 * 加所有服务器加入集合
+	 */</span>
+	<span class="kd">static</span> <span class="o">{</span>
+		<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">servers</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+			<span class="n">realNodes</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">servers</span><span class="o">[</span><span class="n">i</span><span class="o">]);</span>
+		<span class="o">}</span>
+
+		<span class="k">for</span> <span class="o">(</span><span class="nc">String</span> <span class="n">str</span> <span class="o">:</span> <span class="n">realNodes</span><span class="o">)</span> <span class="o">{</span>
+			<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="no">VN_SUM</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+				<span class="nc">String</span> <span class="n">virtualNodeName</span> <span class="o">=</span> <span class="n">str</span> <span class="o">+</span> <span class="s">"&amp;VN"</span> <span class="o">+</span> <span class="nc">String</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+				<span class="kt">int</span> <span class="n">hash</span> <span class="o">=</span> <span class="n">getHash</span><span class="o">(</span><span class="n">virtualNodeName</span><span class="o">);</span>
+				<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"虚拟节点["</span> <span class="o">+</span> <span class="n">virtualNodeName</span> <span class="o">+</span> <span class="s">"]被添加, hash值为"</span> <span class="o">+</span> <span class="n">hash</span><span class="o">);</span>
+				<span class="n">virtualNodes</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">hash</span><span class="o">,</span> <span class="n">virtualNodeName</span><span class="o">);</span>
+			<span class="o">}</span>
+		<span class="o">}</span>
+		<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"\n===========路由映射==============\n"</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="cm">/**
+	 * 使用FNV1_32_HASH算法计算hash值
+	 * 
+	 * @param str
+	 * @return
+	 */</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">getHash</span><span class="o">(</span><span class="nc">String</span> <span class="n">str</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kd">final</span> <span class="kt">int</span> <span class="n">p</span> <span class="o">=</span> <span class="mi">16777619</span><span class="o">;</span>
+		<span class="kt">int</span> <span class="n">hash</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="mi">2166136261L</span><span class="o">;</span>
+		<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">str</span><span class="o">.</span><span class="na">length</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+			<span class="n">hash</span> <span class="o">=</span> <span class="o">(</span><span class="n">hash</span> <span class="o">^</span> <span class="n">str</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">i</span><span class="o">))</span> <span class="o">*</span> <span class="n">p</span><span class="o">;</span>
+		<span class="o">}</span>
+		<span class="n">hash</span> <span class="o">+=</span> <span class="n">hash</span> <span class="o">&lt;&lt;</span> <span class="mi">13</span><span class="o">;</span>
+		<span class="n">hash</span> <span class="o">^=</span> <span class="n">hash</span> <span class="o">&gt;&gt;</span> <span class="mi">7</span><span class="o">;</span>
+		<span class="n">hash</span> <span class="o">+=</span> <span class="n">hash</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="o">;</span>
+		<span class="n">hash</span> <span class="o">^=</span> <span class="n">hash</span> <span class="o">&gt;&gt;</span> <span class="mi">17</span><span class="o">;</span>
+		<span class="n">hash</span> <span class="o">+=</span> <span class="n">hash</span> <span class="o">&lt;&lt;</span> <span class="mi">5</span><span class="o">;</span>
+
+		<span class="c1">// 如果算出来的值为负数则取其绝对值</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">hash</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="o">)</span>
+			<span class="n">hash</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">hash</span><span class="o">);</span>
+		<span class="k">return</span> <span class="n">hash</span><span class="o">;</span>
+	<span class="o">}</span>
+
+	<span class="kd">private</span> <span class="kd">static</span> <span class="nc">String</span> <span class="nf">matchServer</span><span class="o">(</span><span class="nc">String</span> <span class="n">node</span><span class="o">)</span> <span class="o">{</span>
+		<span class="c1">// 待路由结点的Hash值</span>
+		<span class="kt">int</span> <span class="n">hash</span> <span class="o">=</span> <span class="n">getHash</span><span class="o">(</span><span class="n">node</span><span class="o">);</span>
+		<span class="c1">// 得到大于该Hash值的子Map</span>
+		<span class="nc">SortedMap</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="n">subMap</span> <span class="o">=</span> <span class="n">virtualNodes</span><span class="o">.</span><span class="na">tailMap</span><span class="o">(</span><span class="n">hash</span><span class="o">);</span>
+		<span class="c1">// 顺时针的第一个Key</span>
+		<span class="nc">Integer</span> <span class="n">i</span> <span class="o">=</span> <span class="n">subMap</span><span class="o">.</span><span class="na">firstKey</span><span class="o">();</span>
+		<span class="c1">// 截取</span>
+		<span class="nc">String</span> <span class="n">virtualNode</span> <span class="o">=</span> <span class="n">subMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+		
+		<span class="c1">// 返回路由到的服务器名称</span>
+		<span class="k">return</span> <span class="n">virtualNode</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="n">virtualNode</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="s">"&amp;"</span><span class="o">));</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+
+		<span class="nc">String</span><span class="o">[]</span> <span class="n">nodes</span> <span class="o">=</span> <span class="o">{</span> <span class="s">"127.0.0.1:1111"</span><span class="o">,</span> <span class="s">"221.226.0.1:2222"</span><span class="o">,</span> <span class="s">"10.211.0.1:3333"</span><span class="o">,</span> <span class="s">"112.74.15.218:80"</span> <span class="o">};</span>
+		<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nodes</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+			<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span>
+					<span class="s">"["</span> <span class="o">+</span> <span class="n">nodes</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">+</span> <span class="s">"]的hash值为"</span> <span class="o">+</span> <span class="n">getHash</span><span class="o">(</span><span class="n">nodes</span><span class="o">[</span><span class="n">i</span><span class="o">])</span> <span class="o">+</span> <span class="s">",被路由到的服务器为["</span> <span class="o">+</span> <span class="n">matchServer</span><span class="o">(</span><span class="n">nodes</span><span class="o">[</span><span class="n">i</span><span class="o">])</span> <span class="o">+</span> <span class="s">"]"</span><span class="o">);</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<p>关注一下运行结果：</p>
+<pre><code>虚拟节点[192.168.0.0:111&amp;&amp;VN0]被添加, hash值为1686427075
+虚拟节点[192.168.0.0:111&amp;&amp;VN1]被添加, hash值为354859081
+虚拟节点[192.168.0.0:111&amp;&amp;VN2]被添加, hash值为1306497370
+虚拟节点[192.168.0.0:111&amp;&amp;VN3]被添加, hash值为817889914
+虚拟节点[192.168.0.0:111&amp;&amp;VN4]被添加, hash值为396663629
+虚拟节点[192.168.0.1:111&amp;&amp;VN0]被添加, hash值为1032739288
+虚拟节点[192.168.0.1:111&amp;&amp;VN1]被添加, hash值为707592309
+虚拟节点[192.168.0.1:111&amp;&amp;VN2]被添加, hash值为302114528
+虚拟节点[192.168.0.1:111&amp;&amp;VN3]被添加, hash值为36526861
+虚拟节点[192.168.0.1:111&amp;&amp;VN4]被添加, hash值为848442551
+虚拟节点[192.168.0.2:111&amp;&amp;VN0]被添加, hash值为1452694222
+虚拟节点[192.168.0.2:111&amp;&amp;VN1]被添加, hash值为2023612840
+虚拟节点[192.168.0.2:111&amp;&amp;VN2]被添加, hash值为697907480
+虚拟节点[192.168.0.2:111&amp;&amp;VN3]被添加, hash值为790847074
+虚拟节点[192.168.0.2:111&amp;&amp;VN4]被添加, hash值为2010506136
+虚拟节点[192.168.0.3:111&amp;&amp;VN0]被添加, hash值为891084251
+虚拟节点[192.168.0.3:111&amp;&amp;VN1]被添加, hash值为1725031739
+虚拟节点[192.168.0.3:111&amp;&amp;VN2]被添加, hash值为1127720370
+虚拟节点[192.168.0.3:111&amp;&amp;VN3]被添加, hash值为676720500
+虚拟节点[192.168.0.3:111&amp;&amp;VN4]被添加, hash值为2050578780
+虚拟节点[192.168.0.4:111&amp;&amp;VN0]被添加, hash值为586921010
+虚拟节点[192.168.0.4:111&amp;&amp;VN1]被添加, hash值为184078390
+虚拟节点[192.168.0.4:111&amp;&amp;VN2]被添加, hash值为1331645117
+虚拟节点[192.168.0.4:111&amp;&amp;VN3]被添加, hash值为918790803
+虚拟节点[192.168.0.4:111&amp;&amp;VN4]被添加, hash值为1232193678
+ 
+[127.0.0.1:1111]的hash值为380278925, 被路由到结点[192.168.0.0:111]
+[221.226.0.1:2222]的hash值为1493545632, 被路由到结点[192.168.0.0:111]
+[10.211.0.1:3333]的hash值为1393836017, 被路由到结点[192.168.0.2:111]
+
+</code></pre>
+<p>从代码运行结果看，每个点路由到的服务器都是Hash值顺时针离它最近的那个服务器节点，没有任何问题。</p>
+<p>通过采取虚拟节点的方法，一个真实结点不再固定在Hash换上的某个点，而是大量地分布在整个Hash环上，这样即使上线、下线服务器，也不会造成整体的负载不均衡。</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/07/31/algo-consistent-hash/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)">TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>豆包AI编程实践：RSS Web客户端实现 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2025/08/10/doubao-ai/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="豆包AI编程实践：RSS Web客户端实现">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="一、项目需求">
+    <meta name="og:description" content="一、项目需求">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2025/08/10/doubao-ai/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2025-08-10">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="豆包AI编程实践：RSS We">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">豆包AI编程实践：RSS Web客户端实现</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2025/08/10
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#ai" title="ai">ai</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="section">一、项目需求</h1>
+<p>本文旨在通过<strong>豆包AI编程</strong>功能，实践开发一个RSS Web客户端。</p>
+<p>项目需求如下：</p>
+<ol>
+<li><strong>界面简洁美观</strong></li>
+<li><strong>内容精炼</strong>：每个RSS源仅显示最近3条记录，以避免信息过载。</li>
+<li><strong>友好展示</strong>：RSS记录的页面展示应同时对图文和中英文内容友好。</li>
+<li><strong>数据存储</strong>：为避免频繁访问源页面，程序需定时从RSS源抓取数据并存储到本地数据库。</li>
+</ol>
+<p><strong>豆包AI编程</strong><a href="https://www.doubao.com/chat/coding" title="入口">入口</a>如下。</p>
+<p><img src="https://raw.githubusercontent.com/shidongwa/my-images/main/images1/3faf56f5-2784-4ace-af58-65be50b0932e.png" alt="" /></p>
+<h1 id="ai">二、豆包AI编程实践</h1>
+<p><a href="https://www.doubao.com/thread/wf27e769a888072b6" title="豆包AI编程prompt记录">豆包AI编程prompt记录</a></p>
+<h2 id="section-1">2.1 纯前端实现</h2>
+<p>在纯前端实现方案中，RSS源和抓取的网页数据被存储在浏览器的 <strong>LocalStorage</strong> 中。这种方式无法实现跨浏览器、跨用户或跨机器同步，仅适用于演示（demo）目的。该方案支持在豆包平台进行调试，并能生成完整的安装包文件供本地运行和调试。</p>
+<p>下载到本地的好处在于，用户可以自行进行分发和部署，同时解决了某些网站需要<strong>科学上网</strong>才能访问的问题。</p>
+<p>将生成的 <code>html</code> 文件下载到本地后，在同一目录下运行以下命令即可启动一个HTTP服务器：</p>
+<p><code>python3 -m http.server 8000</code></p>
+<p><img src="https://raw.githubusercontent.com/shidongwa/my-images/main/images1/b6be5153-f914-4b60-b76c-38aac41abf30.png" alt="" /></p>
+<p>AI生成和调试过程中，遇到了以下问题：</p>
+<ol>
+<li>
+<p><strong>表单提交限制问题</strong>：
+第一个版本的代码中，<code>form</code> 表单提交存在限制。在遇到问题后，豆包的解决方案是将表单按钮类型从 <code>submit</code> 改为 <code>button</code>，并通过 <strong>JavaScript</strong> 手动提交表单，从而避免了以下错误：</p>
+<pre><code>Blocked form submission to '' because the form's frame is sandboxed and the 'allow-forms' permission is not set.
+</code></pre></li>
+<li>
+<p><strong>跨域问题</strong>：
+由于前端代码需要访问不同的RSS源，会产生跨域问题。豆包平台的解决方案是使用第三方代理服务，例如 <code>https://cors-anywhere.herokuapp.com/</code>，由代理服务器请求RSS源，并在返回给浏览器时声明允许跨域。不过这个访问是临时性的，需要测试时提前申请一个临时时间段，如下。</p>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/shidongwa/my-images/main/images1/520c1ab2-c0d0-4611-aed0-3697b3a860be.png" alt="" /></p>
+<ol start="3">
+<li><strong>网络访问限制</strong>：
+部分RSS源只能通过<strong>科学上网</strong>才能访问，这超出了豆包平台的处理范畴，需要用户自行解决。</li>
+</ol>
+<h2 id="section-2">2.2 前后端实现</h2>
+<p>豆包AI编程支持生成完整的全栈应用方案和代码，包括 <strong>Node.js</strong> 后端API和 <strong>MongoDB</strong> 数据库代码。但该方案不支持直接生成安装包下载，也不支持在平台进行调试。</p>
+<p>Prompt提问过程中豆包回答如下：</p>
+<blockquote>
+<p>由于平台限制，无法直接提供可下载的压缩包文件，但我可以提供一个一键生成完整项目文件的脚本，您只需复制执行即可在本地生成所有代码文件</p>
+</blockquote>
+<p>虽然通过 <strong>shell</strong> 脚本生成所有的代码目录和文件这种方式显得有些原始，但在我的MacBook上测试后，它确实能正常运行。</p>
+<p>生成的项目目录结构如下：</p>
+<p><img src="https://raw.githubusercontent.com/shidongwa/my-images/main/images1/1a84ca47-fb78-475b-8cab-16a8e675f19b.png" alt="" /></p>
+<p><strong>启动服务端</strong></p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># shell生成项目目录和文件,假设shell文件名为genPrj.sh</span>
+<span class="nb">chmod</span> +x genPrj.sh
+./genPrj.sh
+
+<span class="c"># 进入后端目录</span>
+<span class="nb">cd </span>rss-client/server
+
+<span class="c"># 安装依赖</span>
+npm <span class="nb">install</span>
+
+<span class="c"># 启动MongoDB</span>
+brew update
+
+<span class="c"># 安装mongoDB brew仓库</span>
+brew tap mongodb/brew
+
+<span class="c"># 安装community最新版本</span>
+brew <span class="nb">install </span>mongodb-community
+
+<span class="c"># 启动mongoDB服务</span>
+brew services start mongodb-community
+
+<span class="c"># 启动后端服务（确保MongoDB已运行）</span>
+npm start
+</code></pre></div></div>
+<p><strong>启动客户端</strong></p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>rss-client/client
+<span class="c"># 启动前端应用服务</span>
+python3 <span class="nt">-m</span> http.server 8001
+</code></pre></div></div>
+<p>在浏览器中访问 <code>http://localhost:8001</code>，验收成功！</p>
+<p><img src="https://raw.githubusercontent.com/shidongwa/my-images/main/images1/e6e42294-e259-4d8f-bf60-1690cd0b88ba.png" alt="" /></p>
+<h1 id="section-3">三、总结</h1>
+<p>豆包AI编程的优势在于其前端项目的页面和代码生成能力、平台上的部署与调试功能，以及支持将安装包下载到本地进行部署和调试。生成的页面整体视觉效果也很不错。然而，纯前端的解决方案局限性较大，无法满足所有需求。</p>
+<p>虽然它能生成可用的后端代码，但目前不支持在平台上进行部署和调试，也不支持直接生成本地代码安装包。</p>
+<p>从长远来看，如果豆包能实现前后端一体化的代码生成、部署、调试，并支持本地安装包下载，甚至能对接像 Vercel 或 Cloudflare 这样的<strong>PaaS</strong>平台进行自动化部署，那么它的生态将更加完善，也必将吸引大量开发者。</p>
+<p><a href="https://github.com/shidongwa/rss-client" title="github代码">github代码</a></p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2025/08/10/doubao-ai/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>

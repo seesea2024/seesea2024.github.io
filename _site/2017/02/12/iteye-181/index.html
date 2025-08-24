@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Java正则表达式 &mdash; 老实记</title>
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/collection.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/common.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2017/02/12/iteye-181/">
+    <link rel="alternate" type="application/atom+xml" title="老实记" href="http://localhost:4000/feed.xml">
+    <link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+    
+    <meta property="og:title" content="Java正则表达式">
+      
+    <meta name="keywords" content="Stone, shidongwa, shidonghua, 石东华">
+    <meta name="og:keywords" content="Stone, shidongwa, shidonghua, 石东华">
+      
+    <meta name="description" content="转自：http://hi.baidu.com/xu_yunan/blog/item/7ce5d93bb279d22c96ddd843.html各种正则表达式实例用户名^[a-z0-9_-]{3,15}$ ^                         # 行开始[a-z0-9_-]                # 匹配列表中的字符，a-z,0–9,下划线，连字符{3,15}                    # 长度至少3个字符，最大长度为15$                         # 行结束 密码((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{6,20}) (                        # 组开始(?=.*\d)                 # 必须包含一个数字 0-9(?=.*[a-z])              # 必须包含一个小写字符(?=.*[A-Z])              # 必须包含一个大写字符(?=.*[@#$%])             # 必须包含一个列表中的特殊字符&quot;@#$%&quot;.                        # 检查所有字符串与前面的条件的匹配{6,20}                   # 长度至少为6个字符，最大长度为20)                        # 组结束 16进制颜色^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$ ^                       # 行开始#                       # 必须包含一个&quot;#&quot;符号(                       # 组#1开始[A-Fa-f0-9]{6}          # 列表中的任意字符串,长度为6|                       # 或者[A-Fa-f0-9]{3}          # 列表中的任意字符串,长度为3)                       # 组#1结束$                       # 行结束 Email^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$^                            # 行开始[_A-Za-z0-9-]+               # 必须以中括号中的字符为起始字符[],必须包含一个或多个(+)(                            # 组#1开始\\.[_A-Za-z0-9-]+            # 接下来是一个点&quot;.&quot;和中括号内的字符[],必须包含一个或者多个(+))*                           # 组#1结束, 这个组是可选的(*)@                            # 必须包含一个&quot;@&quot;符号[A-Za-z0-9]+                 # 接下来是中括号内的字符[],必须包含一个或者多个(+)(                            # 组 #2开始 – 一级TLD检查\\.[A-Za-z0-9]+              # 接下来是一个点&quot;.&quot;和中括号内的字符[],必须包含一个或者多个(+))*                           # 组#2结束,这个组是可选的(*)(                            # 组#3开始 – 二级TLD检查\\.[A-Za-z]{2,}              # 接下来是一个点&quot;.&quot;和中括号内的字符[], 最小长度为2)                            # 组#3结束$                            # 行结束 图像文件([^\s]+(\.(?i)(jpg|png|gif|bmp))$) (                         # 组#1开始[^\s]+                    # 必须包含一个或更多的任意字符(除了空格)(                         # 组#2开始\.                        # 接下来是一个点&quot;.&quot;(?i)                      # 忽略后边字符的大小写检查             (            # 组#3开始              jpg         #           包含字符&quot;jpg&quot;              |           #           ..或者              png         #           包含字符&quot;png&quot;              |           #           .. 或者              gif         #           包含字符&quot;gif&quot;              |           #           .. 或者              bmp         #           包含字符&quot;bmp&quot;             )            #         组#3结束       )                  #     组#2结束 $                        #   字符串的结束)                         # 组#1结束 补充一个：[\\s\\S]*?([^\\/]*?\\.jpg) IP地址^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$ ^                  # 行开始 (                 #   组#1开始  [01]?\\d\\d?     #     可以是1到2个数字. 如果出现3个数字, 必须以0或者1开始                   #     例如 ([0-9], [0-9][0-9],[0-1][0-9][0-9])    |              #     ...或者  2[0-4]\\d        #     以2开始, 紧跟着是0-4，并且以任意数字结尾(2[0-4][0-9])   |               #     ...或者  25[0-5]          #     以2开始, 紧跟着是5，并且以0-5结尾 (25[0-5]) )                 #   组#1结束  \.               #   接下来是点&quot;.&quot;....               #   重复3次 (3x)$                  # 行结束 12-小时制时间(1[012]|[1-9]):[0-5][0-9](\\s)?(?i)(am|pm) (                                  # 组#1开始 1[012]                            #   以10, 11, 12开始 |                                 #   或者 [1-9]                             #   以1,2,...9开始)                                  # 组#1结束 :                                 #   接下来是一个冒号 (:)  [0-5][0-9]                       #     接下来是0..5和0..9,意思是00到59            (\\s)?                 #       接下来是一个空格(可选)                  (?i)             #         下面的检查不区分大小写                      (am|pm)      #           接下来是AM或者PM 24小时制时间正则表达式模式([01]?[0-9]|2[0-3]):[0-5][0-9] (                                  # 组#1开始 [01]?[0-9]                        #   以0-9,1-9,00-09,10-19开始 |                                 #   或者 2[0-3]                            #   以20-23开始)                                  # 组#1结束 :                                 #   接下来是一个冒号(:)  [0-5][0-9]                       #     接下来是0..5和0..9,意思是00到59 日期格式 (dd/mm/yyyy) 正则表达式模式(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d) (                          # 组#1开始 0?[1-9]                   #   01-09或者1-9 |                         #   ..或者 [12][0-9]                 #   10-19或者20-29 |                         #   ..或者 3[01]                     #   30, 31)                          # 组#1结束  /                        #   接下来是一个&quot;/&quot;   (                       #     组#2开始    0?[1-9]                #       01-09或者1-9    |                      #       ..或者    1[012]                 #       10,11,12    )                      #     组#2结束     /                     #       接下来是一个&quot;/&quot;      (                    #         组#3开始       (19|20)\\d\\d       #           19[0-9][0-9]或者20[0-9][0-9]      )                    #         组#3结束 HTML标签 &lt;(&quot;[^&quot;]*&quot;|'[^']*'|[^'&quot;&gt;])*&gt;  &lt;               # 以&quot;&lt;&quot;标签开始 (               #   组#1开始  &quot;[^&quot;]*&quot;        #     只允许两个双引号成对出现-&quot;string&quot;  |              #     ..或者  '[^']*'        #     只允许两个单引号成对出现- 'string'  |              #     ..或者  [^'&quot;&gt;]         #     不能出现单独的双引号、单引号和&quot;&gt;&quot; )               #   组#1结束 *               #   0次或多次&gt;                # 以结束标签&quot;&gt;&quot;结束 HTML中的A标签正则表达式模式(?i)&lt;a([^&gt;]+)&gt;(.+?)(                 # 组#1开始 ?i               #      所有的检查区分大小写)                 # 组#1结束&lt;a                # 以&quot;&lt;a&quot;开始  (               # 组#2开始   [^&gt;]+          # 除了(&quot;&gt;&quot;)之外的任意字符,至少一个字符  )               # 组#2结束  &gt;               #        接下来是&quot;&gt;&quot;   (.+?)          #          匹配所有&lt;/a&gt;              #            以&quot;&lt;/a&gt;结束提取HTML链接正则表达式模式\s*(?i)href\s*=\s*(\&quot;([^&quot;]*\&quot;)|'[^']*'|([^'&quot;&gt;\s]+));\s*                             # 可以以空格开始  (?i)                          #      所有的检查是区分大小写的     href                       #        接下来是一个&quot;href&quot;字        \s*=\s*                 #          等号两边都允许空格,              (                 #            组#1开始               &quot;([^&quot;]*&quot;)        #              只允许2个双引号成对出现 - &quot;string&quot;               |                #              ..或者               '[^']*'          #              只允许2个单引号成对出现 - 'string'               |                #              ..或者               ([^'&quot;&gt;]+)        #              或者不允许出现单独的单引号、双引号和&quot;&gt;&quot;               )                #            组#1结束">
+    <meta name="og:description" content="转自：http://hi.baidu.com/xu_yunan/blog/item/7ce5d93bb279d22c96ddd843.html各种正则表达式实例用户名^[a-z0-9_-]{3,15}$ ^                         # 行开始[a-z0-9_-]                # 匹配列表中的字符，a-z,0–9,下划线，连字符{3,15}                    # 长度至少3个字符，最大长度为15$                         # 行结束 密码((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{6,20}) (                        # 组开始(?=.*\d)                 # 必须包含一个数字 0-9(?=.*[a-z])              # 必须包含一个小写字符(?=.*[A-Z])              # 必须包含一个大写字符(?=.*[@#$%])             # 必须包含一个列表中的特殊字符&quot;@#$%&quot;.                        # 检查所有字符串与前面的条件的匹配{6,20}                   # 长度至少为6个字符，最大长度为20)                        # 组结束 16进制颜色^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$ ^                       # 行开始#                       # 必须包含一个&quot;#&quot;符号(                       # 组#1开始[A-Fa-f0-9]{6}          # 列表中的任意字符串,长度为6|                       # 或者[A-Fa-f0-9]{3}          # 列表中的任意字符串,长度为3)                       # 组#1结束$                       # 行结束 Email^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$^                            # 行开始[_A-Za-z0-9-]+               # 必须以中括号中的字符为起始字符[],必须包含一个或多个(+)(                            # 组#1开始\\.[_A-Za-z0-9-]+            # 接下来是一个点&quot;.&quot;和中括号内的字符[],必须包含一个或者多个(+))*                           # 组#1结束, 这个组是可选的(*)@                            # 必须包含一个&quot;@&quot;符号[A-Za-z0-9]+                 # 接下来是中括号内的字符[],必须包含一个或者多个(+)(                            # 组 #2开始 – 一级TLD检查\\.[A-Za-z0-9]+              # 接下来是一个点&quot;.&quot;和中括号内的字符[],必须包含一个或者多个(+))*                           # 组#2结束,这个组是可选的(*)(                            # 组#3开始 – 二级TLD检查\\.[A-Za-z]{2,}              # 接下来是一个点&quot;.&quot;和中括号内的字符[], 最小长度为2)                            # 组#3结束$                            # 行结束 图像文件([^\s]+(\.(?i)(jpg|png|gif|bmp))$) (                         # 组#1开始[^\s]+                    # 必须包含一个或更多的任意字符(除了空格)(                         # 组#2开始\.                        # 接下来是一个点&quot;.&quot;(?i)                      # 忽略后边字符的大小写检查             (            # 组#3开始              jpg         #           包含字符&quot;jpg&quot;              |           #           ..或者              png         #           包含字符&quot;png&quot;              |           #           .. 或者              gif         #           包含字符&quot;gif&quot;              |           #           .. 或者              bmp         #           包含字符&quot;bmp&quot;             )            #         组#3结束       )                  #     组#2结束 $                        #   字符串的结束)                         # 组#1结束 补充一个：[\\s\\S]*?([^\\/]*?\\.jpg) IP地址^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$ ^                  # 行开始 (                 #   组#1开始  [01]?\\d\\d?     #     可以是1到2个数字. 如果出现3个数字, 必须以0或者1开始                   #     例如 ([0-9], [0-9][0-9],[0-1][0-9][0-9])    |              #     ...或者  2[0-4]\\d        #     以2开始, 紧跟着是0-4，并且以任意数字结尾(2[0-4][0-9])   |               #     ...或者  25[0-5]          #     以2开始, 紧跟着是5，并且以0-5结尾 (25[0-5]) )                 #   组#1结束  \.               #   接下来是点&quot;.&quot;....               #   重复3次 (3x)$                  # 行结束 12-小时制时间(1[012]|[1-9]):[0-5][0-9](\\s)?(?i)(am|pm) (                                  # 组#1开始 1[012]                            #   以10, 11, 12开始 |                                 #   或者 [1-9]                             #   以1,2,...9开始)                                  # 组#1结束 :                                 #   接下来是一个冒号 (:)  [0-5][0-9]                       #     接下来是0..5和0..9,意思是00到59            (\\s)?                 #       接下来是一个空格(可选)                  (?i)             #         下面的检查不区分大小写                      (am|pm)      #           接下来是AM或者PM 24小时制时间正则表达式模式([01]?[0-9]|2[0-3]):[0-5][0-9] (                                  # 组#1开始 [01]?[0-9]                        #   以0-9,1-9,00-09,10-19开始 |                                 #   或者 2[0-3]                            #   以20-23开始)                                  # 组#1结束 :                                 #   接下来是一个冒号(:)  [0-5][0-9]                       #     接下来是0..5和0..9,意思是00到59 日期格式 (dd/mm/yyyy) 正则表达式模式(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d) (                          # 组#1开始 0?[1-9]                   #   01-09或者1-9 |                         #   ..或者 [12][0-9]                 #   10-19或者20-29 |                         #   ..或者 3[01]                     #   30, 31)                          # 组#1结束  /                        #   接下来是一个&quot;/&quot;   (                       #     组#2开始    0?[1-9]                #       01-09或者1-9    |                      #       ..或者    1[012]                 #       10,11,12    )                      #     组#2结束     /                     #       接下来是一个&quot;/&quot;      (                    #         组#3开始       (19|20)\\d\\d       #           19[0-9][0-9]或者20[0-9][0-9]      )                    #         组#3结束 HTML标签 &lt;(&quot;[^&quot;]*&quot;|'[^']*'|[^'&quot;&gt;])*&gt;  &lt;               # 以&quot;&lt;&quot;标签开始 (               #   组#1开始  &quot;[^&quot;]*&quot;        #     只允许两个双引号成对出现-&quot;string&quot;  |              #     ..或者  '[^']*'        #     只允许两个单引号成对出现- 'string'  |              #     ..或者  [^'&quot;&gt;]         #     不能出现单独的双引号、单引号和&quot;&gt;&quot; )               #   组#1结束 *               #   0次或多次&gt;                # 以结束标签&quot;&gt;&quot;结束 HTML中的A标签正则表达式模式(?i)&lt;a([^&gt;]+)&gt;(.+?)(                 # 组#1开始 ?i               #      所有的检查区分大小写)                 # 组#1结束&lt;a                # 以&quot;&lt;a&quot;开始  (               # 组#2开始   [^&gt;]+          # 除了(&quot;&gt;&quot;)之外的任意字符,至少一个字符  )               # 组#2结束  &gt;               #        接下来是&quot;&gt;&quot;   (.+?)          #          匹配所有&lt;/a&gt;              #            以&quot;&lt;/a&gt;结束提取HTML链接正则表达式模式\s*(?i)href\s*=\s*(\&quot;([^&quot;]*\&quot;)|'[^']*'|([^'&quot;&gt;\s]+));\s*                             # 可以以空格开始  (?i)                          #      所有的检查是区分大小写的     href                       #        接下来是一个&quot;href&quot;字        \s*=\s*                 #          等号两边都允许空格,              (                 #            组#1开始               &quot;([^&quot;]*&quot;)        #              只允许2个双引号成对出现 - &quot;string&quot;               |                #              ..或者               '[^']*'          #              只允许2个单引号成对出现 - 'string'               |                #              ..或者               ([^'&quot;&gt;]+)        #              或者不允许出现单独的单引号、双引号和&quot;&gt;&quot;               )                #            组#1结束">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2017/02/12/iteye-181/">
+    <meta property="og:site_name" content="老实记">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-02-12">
+    
+    <script src="http://localhost:4000/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="http://localhost:4000/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+    <!-- clarity.microsoft -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "rxv5n7dp1c");
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-E5PQNHM9S3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-E5PQNHM9S3');
+  </script>
+  
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="http://localhost:4000/" title="老实记"><span class="octicon octicon-mark-github"></span> 老实记</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="http://localhost:4000/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="http://localhost:4000/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="http://localhost:4000/archives/" class=" site-header-nav-item" target="" title="归档">归档</a>
+                
+                <a href="http://localhost:4000/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="http://localhost:4000/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="http://localhost:4000/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Java正则表达式">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Java正则表达式</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/02/12
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="http://localhost:4000/categories/#iteye" title="iteye">iteye</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>转自：<a href="http://hi.baidu.com/xu_yunan/blog/item/7ce5d93bb279d22c96ddd843.html">http://hi.baidu.com/xu_yunan/blog/item/7ce5d93bb279d22c96ddd843.html</a></p>
+<p>各种正则表达式实例</p>
+<h3 id="section">用户名</h3>
+<pre><code>^[a-z0-9_-]{3,15}$ 
+^                         # 行开始
+[a-z0-9_-]                # 匹配列表中的字符，a-z,0–9,下划线，连字符
+{3,15}                    # 长度至少3个字符，最大长度为15
+$                         # 行结束 
+</code></pre>
+<h3 id="section-1">密码</h3>
+<pre><code>((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{6,20}) 
+(                        # 组开始
+(?=.*\d)                 # 必须包含一个数字 0-9
+(?=.*[a-z])              # 必须包含一个小写字符
+(?=.*[A-Z])              # 必须包含一个大写字符
+(?=.*[@#$%])             # 必须包含一个列表中的特殊字符&quot;@#$%&quot;
+.                        # 检查所有字符串与前面的条件的匹配
+{6,20}                   # 长度至少为6个字符，最大长度为20
+)                        # 组结束 
+</code></pre>
+<h3 id="section-2">16进制颜色</h3>
+<pre><code>^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$ 
+^                       # 行开始
+#                       # 必须包含一个&quot;#&quot;符号
+(                       # 组#1开始
+[A-Fa-f0-9]{6}          # 列表中的任意字符串,长度为6
+|                       # 或者
+[A-Fa-f0-9]{3}          # 列表中的任意字符串,长度为3
+)                       # 组#1结束
+$                       # 行结束 
+</code></pre>
+<h3 id="email">Email</h3>
+<pre><code>^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$
+^                            # 行开始
+[_A-Za-z0-9-]+               # 必须以中括号中的字符为起始字符[],必须包含一个或多个(+)
+(                            # 组#1开始
+\\.[_A-Za-z0-9-]+            # 接下来是一个点&quot;.&quot;和中括号内的字符[],必须包含一个或者多个(+)
+)*                           # 组#1结束, 这个组是可选的(*)
+@                            # 必须包含一个&quot;@&quot;符号
+[A-Za-z0-9]+                 # 接下来是中括号内的字符[],必须包含一个或者多个(+)
+(                            # 组 #2开始 – 一级TLD检查
+\\.[A-Za-z0-9]+              # 接下来是一个点&quot;.&quot;和中括号内的字符[],必须包含一个或者多个(+)
+)*                           # 组#2结束,这个组是可选的(*)
+(                            # 组#3开始 – 二级TLD检查
+\\.[A-Za-z]{2,}              # 接下来是一个点&quot;.&quot;和中括号内的字符[], 最小长度为2
+)                            # 组#3结束
+$                            # 行结束 
+</code></pre>
+<h3 id="section-3">图像文件</h3>
+<pre><code>([^\s]+(\.(?i)(jpg|png|gif|bmp))$) 
+(                         # 组#1开始
+[^\s]+                    # 必须包含一个或更多的任意字符(除了空格)
+(                         # 组#2开始
+\.                        # 接下来是一个点&quot;.&quot;
+(?i)                      # 忽略后边字符的大小写检查
+             (            # 组#3开始
+              jpg         #           包含字符&quot;jpg&quot;
+              |           #           ..或者
+              png         #           包含字符&quot;png&quot;
+              |           #           .. 或者
+              gif         #           包含字符&quot;gif&quot;
+              |           #           .. 或者
+              bmp         #           包含字符&quot;bmp&quot;
+             )            #         组#3结束
+       )                  #     组#2结束
+ $                        #   字符串的结束
+)                         # 组#1结束 
+
+补充一个：[\\s\\S]*?([^\\/]*?\\.jpg) 
+</code></pre>
+<h3 id="ip">IP地址</h3>
+<pre><code>^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$ 
+^                  # 行开始
+ (                 #   组#1开始
+  [01]?\\d\\d?     #     可以是1到2个数字. 如果出现3个数字, 必须以0或者1开始
+                   #     例如 ([0-9], [0-9][0-9],[0-1][0-9][0-9])
+    |              #     ...或者
+  2[0-4]\\d        #     以2开始, 紧跟着是0-4，并且以任意数字结尾(2[0-4][0-9])
+   |               #     ...或者
+  25[0-5]          #     以2开始, 紧跟着是5，并且以0-5结尾 (25[0-5])
+ )                 #   组#1结束
+  \.               #   接下来是点&quot;.&quot;
+....               #   重复3次 (3x)
+$                  # 行结束 
+</code></pre>
+<h3 id="section-4">12-小时制时间</h3>
+<pre><code>(1[012]|[1-9]):[0-5][0-9](\\s)?(?i)(am|pm) 
+(                                  # 组#1开始
+ 1[012]                            #   以10, 11, 12开始
+ |                                 #   或者
+ [1-9]                             #   以1,2,...9开始
+)                                  # 组#1结束
+ :                                 #   接下来是一个冒号 (:)
+  [0-5][0-9]                       #     接下来是0..5和0..9,意思是00到59
+            (\\s)?                 #       接下来是一个空格(可选)
+                  (?i)             #         下面的检查不区分大小写
+                      (am|pm)      #           接下来是AM或者PM 
+</code></pre>
+<h3 id="section-5">24小时制时间正则表达式模式</h3>
+<pre><code>([01]?[0-9]|2[0-3]):[0-5][0-9] 
+(                                  # 组#1开始
+ [01]?[0-9]                        #   以0-9,1-9,00-09,10-19开始
+ |                                 #   或者
+ 2[0-3]                            #   以20-23开始
+)                                  # 组#1结束
+ :                                 #   接下来是一个冒号(:)
+  [0-5][0-9]                       #     接下来是0..5和0..9,意思是00到59 
+</code></pre>
+<h3 id="ddmmyyyy-">日期格式 (dd/mm/yyyy) 正则表达式模式</h3>
+<pre><code>(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d) 
+(                          # 组#1开始
+ 0?[1-9]                   #   01-09或者1-9
+ |                         #   ..或者
+ [12][0-9]                 #   10-19或者20-29
+ |                         #   ..或者
+ 3[01]                     #   30, 31
+)                          # 组#1结束
+  /                        #   接下来是一个&quot;/&quot;
+   (                       #     组#2开始
+    0?[1-9]                #       01-09或者1-9
+    |                      #       ..或者
+    1[012]                 #       10,11,12
+    )                      #     组#2结束
+     /                     #       接下来是一个&quot;/&quot;
+      (                    #         组#3开始
+       (19|20)\\d\\d       #           19[0-9][0-9]或者20[0-9][0-9]
+      )                    #         组#3结束 
+</code></pre>
+<h3 id="html">HTML标签</h3>
+<pre><code> &lt;(&quot;[^&quot;]*&quot;|'[^']*'|[^'&quot;&gt;])*&gt; 
+ &lt;               # 以&quot;&lt;&quot;标签开始
+ (               #   组#1开始
+  &quot;[^&quot;]*&quot;        #     只允许两个双引号成对出现-&quot;string&quot;
+  |              #     ..或者
+  '[^']*'        #     只允许两个单引号成对出现- 'string'
+  |              #     ..或者
+  [^'&quot;&gt;]         #     不能出现单独的双引号、单引号和&quot;&gt;&quot;
+ )               #   组#1结束
+ *               #   0次或多次
+&gt;                # 以结束标签&quot;&gt;&quot;结束 
+</code></pre>
+<h3 id="htmla">HTML中的A标签正则表达式模式</h3>
+<p>(?i)&lt;a([^&gt;]+)&gt;(.+?)</a></p>
+<pre><code>(                 # 组#1开始
+ ?i               #      所有的检查区分大小写
+)                 # 组#1结束
+&lt;a                # 以&quot;&lt;a&quot;开始
+  (               # 组#2开始
+   [^&gt;]+          # 除了(&quot;&gt;&quot;)之外的任意字符,至少一个字符
+  )               # 组#2结束
+  &gt;               #        接下来是&quot;&gt;&quot;
+   (.+?)          #          匹配所有
+&lt;/a&gt;              #            以&quot;&lt;/a&gt;结束
+</code></pre>
+<h3 id="html-1">提取HTML链接正则表达式模式</h3>
+<pre><code>\s*(?i)href\s*=\s*(\&quot;([^&quot;]*\&quot;)|'[^']*'|([^'&quot;&gt;\s]+));
+\s*                             # 可以以空格开始
+  (?i)                          #      所有的检查是区分大小写的
+     href                       #        接下来是一个&quot;href&quot;字
+        \s*=\s*                 #          等号两边都允许空格,
+              (                 #            组#1开始
+               &quot;([^&quot;]*&quot;)        #              只允许2个双引号成对出现 - &quot;string&quot;
+               |                #              ..或者
+               '[^']*'          #              只允许2个单引号成对出现 - 'string'
+               |                #              ..或者
+               ([^'&quot;&gt;]+)        #              或者不允许出现单独的单引号、双引号和&quot;&gt;&quot;
+               )                #            组#1结束
+</code></pre>
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+        <div id="gitalk-container"></div>
+        <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+        <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+        <script>
+        var gitalk = new Gitalk({
+            id: '/2017/02/12/iteye-181/',
+            clientID: '2443c55823f977361bae',
+            clientSecret: 'ace39b2327a62f955b408d4197ff75fc946c8613',
+            repo: 'blog-comments',
+            owner: 'shidongwa',
+            admin: ['shidongwa'],
+            labels: ['gitment'],
+            perPage: 10,
+        })
+        gitalk.render('gitalk-container')
+        </script>
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="http://localhost:4000/assets/css/modules/sidebar-search.css">
+<script src="http://localhost:4000/assets/js/simple-jekyll-search.min.js"></script>
+<script src="http://localhost:4000/assets/js/search.js"></script>
+
+<script type="text/javascript">
+SimpleJekyllSearch({
+    searchInput: document.getElementById('search_box'),
+    resultsContainer: document.getElementById('search_results'),
+    json: 'http://localhost:4000/assets/search_data.json',
+    searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: false,
+    exclude: ['Welcome']
+})
+</script>
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="http://localhost:4000/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2025
+                    <span title="Shi Donghua">Shi Donghua</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/shidongwa/shidongwa.github" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="http://localhost:4000/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/archives/" title="归档" target="">归档</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="http://localhost:4000/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="http://localhost:4000/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="http://localhost:4000/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="http://localhost:4000/assets/js/geopattern.js"></script>
+    <script src="http://localhost:4000/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="http://localhost:4000/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+
+    
+
+    
+
+    
+
+    
+
+    
+</body>
+</html>
