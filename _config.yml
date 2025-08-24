@@ -18,7 +18,7 @@ side_bar_repo_limit: 5
 author: Shi Donghua
 organization: seesea2024.github.io
 organization_url: https://seesea2024.github.io
-github_username: shidongwa
+github_username: seesea2024
 location: Shanghai, China
 email: 10189795@qq.com
 pub_wx: WX公众号：老实记
@@ -83,7 +83,7 @@ collections:
         output: true
         permalink: /wiki/:path/
 
-repository: shidongwa/shidongwa.github
+repository: seesea2024/seesea2024.github.io
 
 # ---------------- #
 #      Comments    #
